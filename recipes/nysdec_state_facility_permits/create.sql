@@ -33,7 +33,10 @@ CREATE TEMP TABLE nysdec_state_facility_permits (
 DROP TABLE IF EXISTS :NAME.:"VERSION" CASCADE;
 SELECT 
     *,
-    ST_SetSRID(ST_MakePoint(geo_longitude,geo_latitude),4326)::geometry(Point,4326) as geom
+    (CASE WHEN geo_function = 'Intersection'
+        THEN ST_TRANSFORM(ST_SetSRID(ST_MakePoint(geo_x_coord,geo_y_coord),2263),4326)
+        ELSE ST_SetSRID(ST_MakePoint(geo_longitude,geo_latitude),4326)
+    END)::geometry(Point,4326) as geom
 INTO :NAME.:"VERSION"
 FROM nysdec_state_facility_permits;
 
