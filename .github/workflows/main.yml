@@ -22,7 +22,13 @@ jobs:
         
       - name: Run recipe
         shell: bash
-        run: ./ceqr run recipe ${{ github.event.issue.title }}
+        run: |
+          title=${{ github.event.issue.title }}
+          recipes=$(python -c "print('$title').replace('[build] ', '')")
+          for i in $(echo $recipes | tr " " "\n")
+          do
+            ./ceqr run recipe $i
+          done
           
       - name: Close Issue
         if: ${{ success() }}
