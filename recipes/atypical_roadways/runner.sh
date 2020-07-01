@@ -1,6 +1,7 @@
 #!/bin/bash
 source $(pwd)/bin/config.sh
 BASEDIR=$(dirname $0)
+NAME=$(basename $BASEDIR)
 VERSION=$DATE
 
 (
@@ -52,4 +53,6 @@ VERSION=$DATE
         echo "$VERSION" > version.txt
         
     )
+    Upload $NAME $VERSION
+    Upload $NAME latest
 )

@@ -40,3 +40,8 @@ function SHP_export {
   mv $4/$4.zip $4.zip
   rm -rf $4
 }
+
+function Upload {
+  mc rm -r --force spaces/edm-publishing/ceqr-app-data/$1/$2
+  mc cp -r output spaces/edm-publishing/ceqr-app-data/$1/$2
+}
