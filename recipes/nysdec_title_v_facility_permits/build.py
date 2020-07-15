@@ -41,6 +41,8 @@ def _import() -> pd.DataFrame:
         "location",
     ]
     df = pd.read_csv(url, dtype=str, engine="c", index_col=False)
+    df.to_csv("output/raw.csv", index=False)
+
     czb = pd.read_csv("../_data/city_zip_boro.csv", dtype=str, engine="c")
 
     df.columns = [i.lower().replace(" ", "_") for i in df.columns]

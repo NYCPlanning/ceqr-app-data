@@ -6,16 +6,18 @@ VERSION=$DATE
 
 (
     cd $BASEDIR
+    mkdir -p output
+
     docker run --rm\
         -v $(pwd)/../:/recipes\
         -w /recipes/$NAME\
+        --user $UID\
         nycplanning/docker-geosupport:latest python3 build.py | 
     psql $EDM_DATA -v VERSION=$VERSION -f create.sql
 
-    mkdir -p output && 
     (
         cd output
-        
+
         # Export to CSV
         psql $EDM_DATA -c "\COPY (
             SELECT * FROM $NAME.\"$VERSION\"
