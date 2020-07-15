@@ -6,6 +6,8 @@ VERSION=$DATE
 
 (
     cd $BASEDIR
+    mkdir -p output
+    
     docker run --rm\
         -v $(pwd)/../:/recipes\
         -e NAME=$NAME\
@@ -13,7 +15,6 @@ VERSION=$DATE
         nycplanning/docker-geosupport:latest python3 build.py | 
     psql $EDM_DATA -v NAME=$NAME -v VERSION=$VERSION -f create.sql
 
-    mkdir -p output && 
     (
         cd output
         
