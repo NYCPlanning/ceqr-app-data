@@ -11,6 +11,8 @@ def get_borocode(c):
 def _import() -> pd.DataFrame:
     url = "https://data.ny.gov/api/views/qcpj-zdb6/rows.csv"
     df = pd.read_csv(url, dtype=str, engine="c", index_col=False)
+    df.to_csv("output/raw.csv", index=False)
+
     df.columns = [i.lower().replace(" ", "_") for i in df.columns]
     cols = [
         "region",
@@ -42,6 +44,7 @@ def _import() -> pd.DataFrame:
     ]
     for col in cols:
         assert col in df.columns
+
     df["borocode"] = df.county.apply(get_borocode)
     df = df.loc[df.region == "2", :]
     return df

@@ -89,6 +89,8 @@ def _import() -> pd.DataFrame:
     for col in cols:
         assert col in df.columns
 
+    df.to_csv("output/raw.csv", index=False)
+
     df.rename(
         columns={
             "house": "housenum",

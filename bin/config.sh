@@ -41,7 +41,18 @@ function SHP_export {
   rm -rf $4
 }
 
+function CSV_export {
+  psql $1  -c "\COPY (
+    SELECT * FROM $2
+  ) TO STDOUT DELIMITER ',' CSV HEADER;" > $3.csv
+}
+
 function Upload {
-  mc rm -r --force spaces/edm-publishing/ceqr-app-data/$1/$2
-  mc cp -r output spaces/edm-publishing/ceqr-app-data/$1/$2
+  mc rm -r --force spaces/edm-publishing/ceqr-app-data-staging/$1/$2
+  for file in output/*
+  do
+    name=$(basename $file)
+    mc cp $file spaces/edm-publishing/ceqr-app-data-staging/$1/$2/$name
+  done
+  wait
 }

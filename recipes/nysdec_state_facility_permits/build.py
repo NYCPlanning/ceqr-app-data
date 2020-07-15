@@ -8,6 +8,7 @@ import re
 from _helper.geo import get_hnum, get_sname, air_geocode as geocode
 from multiprocessing import Pool, cpu_count
 
+
 def clean_address(x):
     x = "" if x is None else x
     sep = ["|", "&", "@", " AND "]
@@ -40,6 +41,8 @@ def _import() -> pd.DataFrame:
         "location",
     ]
     df = pd.read_csv(url, dtype=str, engine="c", index_col=False)
+    df.to_csv("output/raw.csv", index=False)
+
     czb = pd.read_csv("../_data/city_zip_boro.csv", dtype=str, engine="c")
     corr = pd.read_csv("../_data/air_corr.csv", dtype=str, engine="c")
     corr = corr.loc[corr.datasource == "nysdec_state_facility_permits", :]
