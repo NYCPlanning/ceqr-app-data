@@ -59,5 +59,5 @@ function Upload {
 
 function Publish {
   mc rm -r --force spaces/edm-publishing/ceqr-app-data/$1/$2
-  mc cp -r spaces/edm-publishing/ceqr-app-data-staging/$1/$2 spaces/edm-publishing/ceqr-app-data/$1/$2
+  mc cp -r spaces/edm-publishing/ceqr-app-data-staging/$1/$2 spaces/edm-publishing/ceqr-app-data/$1/
 }
