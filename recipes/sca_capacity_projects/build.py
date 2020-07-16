@@ -9,16 +9,16 @@ from _helper.geo import get_hnum, get_sname, clean_house, clean_street, schools_
 from multiprocessing import Pool, cpu_count
 
 
-def import() -> pd.DataFrame:
-    df = pd.read_sql('output/_sca_capacity_projects.csv')
-
+def _import() -> pd.DataFrame:
+    df = pd.read_csv('output/_sca_capacity_projects.csv')
+    
     # Import csv to replace invalid addresses with manual corrections
-    cor_add_dict = pd.read_csv('https://raw.githubusercontent.com/NYCPlanning/ceqr-app-data/master/ceqr/data/sca_capacity_address_cor.csv').to_dict('records')
+    cor_add_dict = pd.read_csv('../_data/sca_capacity_address_cor.csv', dtype=str, engine="c").to_dict('records')
     for record in cor_add_dict:
         df.loc[df['name']==record['school'],'address'] = record['address'].upper()
 
     # Import csv to replace org_levels with manual corrections
-    cor_org_dict = pd.read_csv('https://raw.githubusercontent.com/NYCPlanning/ceqr-app-data/master/ceqr/data/sca_capacity_org_level_cor.csv').to_dict('records')
+    cor_org_dict = pd.read_csv('../_data/sca_capacity_org_level_cor.csv', dtype=str, engine="c").to_dict('records')
     for record in cor_org_dict:
         df.loc[df['name']==record['school'],'org_level'] = record['org_level']
 
@@ -26,7 +26,8 @@ def import() -> pd.DataFrame:
     df['hnum'] = df.address.apply(get_hnum).apply(lambda x: clean_house(x))
     df['sname'] = df.address.apply(get_sname).apply(lambda x: clean_street(x))
 
-    df.to_csv('output/corrected.csv')
+    df.to_csv('output/_sca_capacity_project_corrected.csv')
+    return df
     
 def _geocode(df: pd.DataFrame) -> pd.DataFrame:
     records = df.to_dict('records')
@@ -39,10 +40,7 @@ def _geocode(df: pd.DataFrame) -> pd.DataFrame:
     df = pd.DataFrame(it)
     df['geo_longitude'] = pd.to_numeric(df['geo_longitude'], errors='coerce')
     df['geo_latitude'] = pd.to_numeric(df['geo_latitude'], errors='coerce')
-    df['geom'] = df['geometry'].apply(lambda x: None if np.isnan(x.xy[0]) else str(x))
-
-    geo_rejects = df[(df['geom'].isnull())&(df['geo_x_coord']=='')&(df['geo_from_x_coord'].isnull())&(df['geo_xy_coord']=='')]
-    print('Percent of records geocoded: ', (len(df)-len(geo_rejects))/len(df))
+    
     return df
 
 def _output(df):
@@ -68,16 +66,16 @@ def _output(df):
         "geo_to_x_coord",
         "geo_to_y_coord",
         "geo_function",
-        "geom",
         "geo_grc",
         "geo_grc2",
         "geo_reason_code",
         "geo_message"
     ]
-    df_filtered[cols].to_csv('output/all_capacity_projects.csv')
+    df[cols].to_csv('output/all_capacity_projects.csv')
 
     # Remove special ed cases
     df_filtered = df[(df['district']!='75')&(df.org_level!='PK')&(df.org_level!='3K')]
+    print(df_filtered.head(20))
     df_filtered[cols].to_csv(sys.stdout, index=False)
 
 if __name__ == "__main__":

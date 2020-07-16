@@ -4,7 +4,6 @@ import re
 
 g = Geosupport()
 
-
 def get_hnum(address):
     address = "" if address is None else address
     result = [k for (k, v) in usaddress.parse(address) if re.search("Address", v)]

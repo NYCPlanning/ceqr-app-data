@@ -47,7 +47,7 @@ CREATE TEMP TABLE tmp as (
                 WHEN REGEXP_REPLACE(c.name, '[^\w]+','','g') LIKE '%HS%' THEN 'HS'
                 WHEN REGEXP_REPLACE(c.name, '[^\w]+','','g') LIKE '%HIGH%' THEN 'HS'
                 WHEN REGEXP_REPLACE(c.name, '[^\w]+','','g') LIKE '%D75%' THEN NULL
-            END as org_level
+            END as org_level,
             c.district,
             c.capacity,
             CASE
@@ -59,12 +59,13 @@ CREATE TEMP TABLE tmp as (
             END as borough,
             c.address,
             c.start_date,
-            c.capital_plan,
+            c.capital_plan
         
         FROM combined c)
 
     SELECT
         a.uid,
+        a.name,
         a.org_level,
         a.district,
         a.capacity,

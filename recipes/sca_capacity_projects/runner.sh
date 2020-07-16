@@ -9,7 +9,7 @@ VERSION=$DATE
     mkdir -p output
 
     psql -q $RECIPE_ENGINE -f build.sql
-    
+
     docker run --rm\
         -v $(pwd)/../:/recipes\
         -w /recipes/$NAME\

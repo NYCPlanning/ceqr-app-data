@@ -1,29 +1,29 @@
 CREATE TEMP TABLE sca_capacity_projects (
-    uid text
-    name text
-    org_level text
-    district text
-    capacity bigint
-    pct_ps double precision
-    pct_is double precision
-    pct_hs double precision
-    guessed_pct boolean
-    start_date date
-    capital_plan text
-    borough text
-    address text
-    geo_xy_coord text
-    geo_x_coord double precision
-    geo_y_coord double precision
-    geo_from_x_coord double precision
-    geo_from_y_coord double precision
-    geo_to_x_coord double precision
-    geo_to_y_coord double precision
-    geo_function text
-    geom geometry
-    geo_grc text
-    geo_grc2 text
-    geo_reason_code text
+    uid text,
+    name text,
+    org_level text,
+    district text,
+    capacity bigint,
+    pct_ps double precision,
+    pct_is double precision,
+    pct_hs double precision,
+    guessed_pct boolean,
+    start_date date,
+    capital_plan text,
+    borough text,
+    address text,
+    geo_xy_coord text,
+    geo_x_coord double precision,
+    geo_y_coord double precision,
+    geo_from_x_coord double precision,
+    geo_from_y_coord double precision,
+    geo_to_x_coord double precision,
+    geo_to_y_coord double precision,
+    geo_function text,
+    geom geometry,
+    geo_grc text,
+    geo_grc2 text,
+    geo_reason_code text,
     geo_message text
 );
 
