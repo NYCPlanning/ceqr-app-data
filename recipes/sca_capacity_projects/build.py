@@ -10,7 +10,7 @@ from multiprocessing import Pool, cpu_count
 
 
 def import() -> pd.DataFrame:
-    df = pd.read_sql('output/cleaned.csv')
+    df = pd.read_sql('output/_sca_capacity_projects.csv')
 
     # Import csv to replace invalid addresses with manual corrections
     cor_add_dict = pd.read_csv('https://raw.githubusercontent.com/NYCPlanning/ceqr-app-data/master/ceqr/data/sca_capacity_address_cor.csv').to_dict('records')
@@ -39,7 +39,6 @@ def _geocode(df: pd.DataFrame) -> pd.DataFrame:
     df = pd.DataFrame(it)
     df['geo_longitude'] = pd.to_numeric(df['geo_longitude'], errors='coerce')
     df['geo_latitude'] = pd.to_numeric(df['geo_latitude'], errors='coerce')
-    df = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df.geo_longitude, df.geo_latitude))
     df['geom'] = df['geometry'].apply(lambda x: None if np.isnan(x.xy[0]) else str(x))
 
     geo_rejects = df[(df['geom'].isnull())&(df['geo_x_coord']=='')&(df['geo_from_x_coord'].isnull())&(df['geo_xy_coord']=='')]
@@ -75,8 +74,8 @@ def _output(df):
         "geo_reason_code",
         "geo_message"
     ]
-    df_filtered[cols].to_csv('output/unfiltered_capacity_projects.csv')
-    
+    df_filtered[cols].to_csv('output/all_capacity_projects.csv')
+
     # Remove special ed cases
     df_filtered = df[(df['district']!='75')&(df.org_level!='PK')&(df.org_level!='3K')]
     df_filtered[cols].to_csv(sys.stdout, index=False)
