@@ -33,9 +33,20 @@ CREATE TEMP TABLE sca_capacity_projects (
 DROP TABLE IF EXISTS :NAME.:"VERSION" CASCADE;
 SELECT 
     *,
-    (CASE WHEN geo_function = 'Intersection'
+    (CASE 
+        WHEN geo_function = 'Intersection'
+        -- Create  geometry from x_coord and y_coord
         THEN ST_TRANSFORM(ST_SetSRID(ST_MakePoint(geo_x_coord,geo_y_coord),2263),4326)
-        ELSE ST_SetSRID(ST_MakePoint(geo_longitude,geo_latitude),4326)
+        WHEN geo_function = 'Segment'
+        -- Find the middle of the segment by creating a line from to/from coords
+        THEN ST_centroid(ST_MakeLine(
+                ST_TRANSFORM(ST_SetSRID(
+                    ST_MakePoint(geo_from_x_coord::NUMERIC, geo_from_y_coord::NUMERIC),2263),4326),
+                ST_TRANSFORM(ST_SetSRID(
+                    ST_MakePoint(geo_to_x_coord::NUMERIC, geo_to_y_coord::NUMERIC),2263),4326)))
+        -- Create geometry from xy_coord
+        ELSE ST_TRANSFORM(ST_SetSRID(ST_MakePoint(LEFT(geo_xy_coord, 7)::DOUBLE PRECISION,
+                                            RIGHT(geo_xy_coord, 7)::DOUBLE PRECISION),2263),4326)
     END)::geometry(Point,4326) as geom
 INTO :NAME.:"VERSION"
 FROM sca_capacity_projects;
