@@ -28,7 +28,4 @@ VERSION=$DATE
 
     Upload $NAME $VERSION
     Upload $NAME latest
-
-    Publish $NAME $VERSION
-    Publish $NAME latest
 )
