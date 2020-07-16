@@ -64,6 +64,16 @@ SELECT
 INTO :NAME.:"VERSION"
 FROM sca_capacity_projects;
 
+INSERT INTO :NAME."geo_rejects"
+SELECT *
+FROM :NAME.:"VERSION"
+WHERE geom IS NULL
+AND name NOT IN (SELECT DISTINCT name FROM :NAME."geo_rejects");
+
+DELETE
+FROM :NAME.:"VERSION"
+WHERE geom IS NULL;
+
 DROP VIEW IF EXISTS :NAME.latest;
 CREATE VIEW :NAME.latest AS (
     SELECT :"VERSION" as v, * 
