@@ -58,6 +58,30 @@ function Upload {
 }
 
 function Publish {
+  echo "publishing ceqr-app-data-staging/$1/$2"
   mc rm -r --force spaces/edm-publishing/ceqr-app-data/$1/$2
-  mc cp -r spaces/edm-publishing/ceqr-app-data-staging/$1/$2 spaces/edm-publishing/ceqr-app-data/$1/
+  mc cp -r spaces/edm-publishing/ceqr-app-data-staging/$1/$2 /tmp/ceqr-app-data-staging/$1/$2
+  mc cp -r /tmp/ceqr-app-data-staging/$1/$2 spaces/edm-publishing/ceqr-app-data/$1/$2
+
+  echo "promote $1/$2 to latest"
+  mc rm -r --force spaces/edm-publishing/ceqr-app-data/$1/latest 
+  mc cp -r /tmp/ceqr-app-data-staging/$1/$2 spaces/edm-publishing/ceqr-app-data/$1/latest
+  rm -rf /tmp/ceqr-app-data-staging/$1/$2
 }
+register 'publish' 'recipe' '{ recipe name } { version name } e.g. nysdot_aadt 2020-07-16' Publish
+
+function List {
+  if [[ "$2" == "production" ]]
+  then
+    echo "
+    listing ceqr-app-data/$1
+    "
+    mc ls spaces/edm-publishing/ceqr-app-data/$1
+  else
+    echo "
+    listing ceqr-app-data-staging/$1
+    "
+    mc ls spaces/edm-publishing/ceqr-app-data-staging/$1
+  fi
+}
+register 'list' 'recipe' '{ recipe name } { staging or production}' List
