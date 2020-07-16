@@ -32,7 +32,20 @@ CREATE TEMP TABLE sca_capacity_projects (
 
 DROP TABLE IF EXISTS :NAME.:"VERSION" CASCADE;
 SELECT 
-    *,
+    uid,
+    name,
+    org_level,
+    district,
+    capacity,
+    pct_ps,
+    pct_is,
+    pct_hs,
+    guessed_pct,
+    start_date,
+    capital_plan,
+    borough,
+    address,
+    geo_function,
     (CASE 
         -- Intersections: Create  geometry from x_coord and y_coord
         WHEN geo_function = 'Intersection'
