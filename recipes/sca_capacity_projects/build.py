@@ -75,8 +75,7 @@ def _output(df):
 
     # Remove special ed cases
     df_filtered = df[(df['district']!='75')&(df.org_level!='PK')&(df.org_level!='3K')]
-    print(df_filtered.head(20))
-    df_filtered[cols].to_csv(sys.stdout, index=False)
+    df_filtered[cols].to_csv(sys.stdout, sep='|', index=False)
 
 if __name__ == "__main__":
     df = _import()

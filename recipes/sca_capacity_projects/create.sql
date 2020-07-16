@@ -20,15 +20,13 @@ CREATE TEMP TABLE sca_capacity_projects (
     geo_to_x_coord double precision,
     geo_to_y_coord double precision,
     geo_function text,
-    geom geometry,
     geo_grc text,
     geo_grc2 text,
     geo_reason_code text,
     geo_message text
 );
 
-
-\COPY sca_capacity_projects FROM PSTDIN DELIMITER ',' CSV HEADER;
+\COPY sca_capacity_projects FROM PSTDIN DELIMITER '|' CSV HEADER;
 
 DROP TABLE IF EXISTS :NAME.:"VERSION" CASCADE;
 SELECT 
@@ -68,6 +66,6 @@ FROM sca_capacity_projects;
 
 DROP VIEW IF EXISTS :NAME.latest;
 CREATE VIEW :NAME.latest AS (
-    SELECT :'VERSION' as v, * 
+    SELECT :"VERSION" as v, * 
     FROM :NAME.:"VERSION"
 );
