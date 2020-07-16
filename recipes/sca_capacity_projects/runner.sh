@@ -32,4 +32,7 @@ VERSION=$DATE
         echo "$VERSION" > version.txt
         
     )
+    
+    Upload $NAME $VERSION
+    Upload $NAME latest
 )
