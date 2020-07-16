@@ -51,11 +51,11 @@ CREATE TEMP TABLE tmp as (
             c.district,
             c.capacity,
             CASE
-                WHEN borough = 'M' THEN 'Manhattan'
-                WHEN borough = 'X' THEN 'Bronx'
-                WHEN borough = 'K' THEN 'Brooklyn'
-                WHEN borough = 'Q' THEN 'Queens'
-                WHEN borough = 'R' THEN 'Staten Island'
+                WHEN TRIM(borough) = 'M' THEN 'Manhattan'
+                WHEN TRIM(borough) = 'X' THEN 'Bronx'
+                WHEN TRIM(borough) = 'K' THEN 'Brooklyn'
+                WHEN TRIM(borough) = 'Q' THEN 'Queens'
+                WHEN TRIM(borough) = 'R' THEN 'Staten Island'
             END as borough,
             c.address,
             c.start_date,
