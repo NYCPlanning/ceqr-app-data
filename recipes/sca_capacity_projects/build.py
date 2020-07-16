@@ -40,7 +40,7 @@ def _geocode(df: pd.DataFrame) -> pd.DataFrame:
     df = pd.DataFrame(it)
     df['geo_longitude'] = pd.to_numeric(df['geo_longitude'], errors='coerce')
     df['geo_latitude'] = pd.to_numeric(df['geo_latitude'], errors='coerce')
-    
+
     return df
 
 def _output(df):
