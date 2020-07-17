@@ -11,8 +11,8 @@ VERSION=$DATE
             -v $(pwd)/../:/recipes\
             -e NAME=$NAME\
             -w /recipes/$NAME\
-            nycplanning/cook:latest python3 build.py 
-    | psql $EDM_DATA -v NAME=$NAME -v VERSION=$VERSION -f create.sql
+            nycplanning/cook:latest python3 build.py | 
+    psql $EDM_DATA -v NAME=$NAME -v VERSION=$VERSION -f create.sql
 
     mkdir -p output && 
     (

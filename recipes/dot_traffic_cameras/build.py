@@ -7,5 +7,8 @@ r = requests.get('https://webcams.nyctmc.org/new-data.php?query=', headers = use
 df = pd.DataFrame(r['markers'])
 df['url'] = 'https://webcams.nyctmc.org/google_popup.php?cid=' + df.id
 
-df.to_csv('raw.csv', 
-    cols=['content', 'icon', 'id', 'latitude', 'longitude', 'title', 'url'], index=False)
+df.to_csv('output/raw.csv',
+    columns=['content', 'icon', 'id', 'latitude', 'longitude', 'title', 'url'], index=False)
+
+df.to_csv(sys.stdout,
+    columns=['content', 'icon', 'id', 'latitude', 'longitude', 'title', 'url'], index=False)

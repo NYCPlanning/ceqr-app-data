@@ -6,7 +6,7 @@ CREATE TEMP TABLE tmp (
     longitude double precision,
     title text,
     url text
-)
+);
 
 
 \COPY tmp FROM PSTDIN DELIMITER ',' CSV HEADER;
