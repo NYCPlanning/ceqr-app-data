@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
 
     # Unpivot the table
-    df_unpivot = df.drop(columns=['projected']).melt(id_vars=['district', 'subdistrict','level','multiplier'], 
+    df_unpivot = df.melt(id_vars=['district', 'subdistrict','level','multiplier','projected'], 
                                                     var_name='school_year', 
                                                     value_name='e')
     df_unpivot.to_csv('output/unpivoted.csv', index=False)
