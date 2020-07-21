@@ -1,7 +1,7 @@
 CREATE TEMP TABLE tmp (
     district character varying,
     borough character varying,
-    year integer,
+    year character varying,
     hs integer
 );
 
@@ -9,12 +9,13 @@ CREATE TEMP TABLE tmp (
 
 DROP TABLE IF EXISTS :NAME.:"VERSION" CASCADE;
 SELECT 
-    year,
+    LEFT(year, 4) as year,
     borough,
     SUM(hs) as hs
 INTO :NAME.:"VERSION"
 FROM tmp
-GROUP BY year, borough;
+GROUP BY year, borough
+ORDER BY borough, year;
 
 DROP VIEW IF EXISTS :NAME.latest;
 CREATE VIEW :NAME.latest AS (
