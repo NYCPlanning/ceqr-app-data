@@ -5,7 +5,7 @@ on:
 
 jobs:
   push:
-    if: ${{ github.event.issue.author_association == 'MEMBER' && contains(github.event.issue.title, '[build]') && github.event.issue.state == 'open' }}
+    if: github.event.issue.author_association == 'MEMBER' && contains(github.event.issue.title, '[build]')
     runs-on: ubuntu-latest
     env:
       RECIPE_ENGINE: ${{ secrets.RECIPE_ENGINE }}
@@ -20,7 +20,7 @@ jobs:
         shell: bash
         run: ./ceqr setup
         
-      - name: Run recipe
+      - name: Run recipes
         shell: bash
         run: |
           title='${{ github.event.issue.title }}'
