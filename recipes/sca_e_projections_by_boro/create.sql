@@ -13,7 +13,7 @@ SELECT
     borough,
     SUM(hs) as hs
 INTO :NAME.:"VERSION"
-FROM sca_capacity_projects
+FROM tmp
 GROUP BY year, borough;
 
 DROP VIEW IF EXISTS :NAME.latest;
