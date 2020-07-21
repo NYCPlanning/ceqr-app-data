@@ -37,8 +37,8 @@ CREATE TEMP TABLE tmp as (
         school_year,
         district,
         subdistrict,
-        sum("is")::integer as "is",
-        sum("ps")::integer as "ps"
+        CEILING(sum("is"))::integer as "is",
+        CEILING(sum("ps"))::integer as "ps"
     FROM MULTIPLY
     GROUP BY district, subdistrict, school_year
     ORDER BY district, subdistrict, school_year
