@@ -1,3 +1,32 @@
+/*
+DESCRIPTION:
+   Import ceqr_school_buildings to EDM database using PSTDIN
+INPUTS: 
+    PSTDIN >> 
+    TEMP tmp(
+        district integer,
+        subdistrict integer,
+        borocode integer,
+        bldg_name character varying,
+        excluded boolean,
+        bldg_id character varying,
+        org_id character varying,
+        org_level character varying,
+        name character varying,
+        address character varying,
+        pc integer,
+        pe integer,
+        ic integer,
+        ie integer,
+        hc integer,
+        he integer,
+        geom geometry
+    )
+OUTPUTS:
+	ceqr_school_buildings.latest(
+        Same schema as input
+    )
+*/
 CREATE TEMP TABLE tmp (
     district integer,
     subdistrict integer,
