@@ -5,6 +5,16 @@ import re
 g = Geosupport()
 
 def get_hnum(address):
+    """ 
+    Parse address to extract house number using usaddress module
+
+    Parameters: 
+    address (str): Full address
+
+    Returns:
+    result (str): All portions of the address string
+                    tagged by usaddress as a house number
+    """
     address = "" if address is None else address
     result = [k for (k, v) in usaddress.parse(address) if re.search("Address", v)]
     result = " ".join(result)
@@ -15,6 +25,16 @@ def get_hnum(address):
 
 
 def get_sname(address):
+    """ 
+    Parse address to extract street name using usaddress module
+
+    Parameters: 
+    address (str): Full address
+
+    Returns:
+    result (str): All portions of the address string
+                    tagged by usaddress as a street name
+    """
     result = (
         [k for (k, v) in usaddress.parse(address) if re.search("Street", v)]
         if address is not None
@@ -27,6 +47,18 @@ def get_sname(address):
         return result
 
 def clean_house(s):
+    """ 
+    Transform house number to a geosupport-readable format
+    
+    Replace NULL with empty strings, remove special characters & excess white space,
+    take first house number if there is additional information after a / or in parentheses
+
+    Parameters: 
+    s (str): House number
+
+    Returns:
+    s (str): Cleaned house number
+    """
     s = ' ' if s == None else s
     s = re.sub(r"\([^)]*\)", "", s)\
         .replace(' - ', '-')\
@@ -36,6 +68,18 @@ def clean_house(s):
     return s
 
 def clean_street(s):
+    """ 
+    Transform street name to a geosupport-readable format
+    
+    Replace NULL with empty strings, remove apostrophes & special characters,
+    take first street name if there is additional information after a / or in parentheses
+
+    Parameters: 
+    s (str): Street name
+
+    Returns:
+    s (str): Cleaned street name
+    """
     s = '' if s == None else s
     s = re.sub(r"\([^)]*\)", "", s)\
         .replace("'","")\
@@ -44,6 +88,17 @@ def clean_street(s):
     return s
 
 def find_stretch(address):
+    """ 
+    Finds addresses that indicate a stretch and spilts into components
+
+    Parameters: 
+    address (str): Full address
+
+    Returns:
+    street_1 (str): "On" street
+    street_2 (str): Bounding street 1
+    street_3 (str): Bounding street 2
+    """
     if 'BETWEEN' in address:
         street_1 = address.split('BETWEEN')[0].strip()
         street_2 = (address.split('BETWEEN')[1].split('AND')[0] + address.split(' ')[-1]).strip()
@@ -53,6 +108,9 @@ def find_stretch(address):
         return '','',''
     
 def find_intersection(address):
+    """ 
+    Finds addresses that indicate an intersection and spilts into two streets
+    """
     if 'AND' in address:
         street_1 = address.split('AND')[0].strip()
         street_2 = address.split('AND')[1].strip()
@@ -62,7 +120,19 @@ def find_intersection(address):
 
 
 def air_geocode(inputs):
+    """ 
+    Runs cleaned & parsed address information through geosupport
 
+    First attempt is 1B, then 1B-TPAD, then 2 
+
+    Parameters: 
+    inputs (dict): Contains address information
+        including hnum, sname, borough, street_name_1, street_name_2
+
+    Returns:
+    geo (dict): Contains inputs as well as geosupport fields
+        See geo_parser() for full list of fields
+    """
     hnum, sname, borough, street_name_1, street_name_2 = (
         str("" if inputs[k] is None else inputs[k])
         for k in ("hnum", "sname", "borough", "streetname_1", "streetname_2")
@@ -102,6 +172,20 @@ def air_geocode(inputs):
     return geo
 
 def schools_geocode(inputs):
+    """ 
+    Runs cleaned & parsed address information through geosupport
+
+    First attempt is 1B, then attempts to parse stretch and run 3, then
+    attempts to parse intersection and run 2 
+
+    Parameters: 
+    inputs (dict): Contains address information
+        including hnum, sname, borough, address
+
+    Returns:
+    geo (dict): Contains inputs as well as geosupport fields
+        See geo_parser() for full list of fields
+    """
     hnum = inputs.get('hnum', '')
     sname = inputs.get('sname', '')
     borough = inputs.get('borough', '')
@@ -155,6 +239,18 @@ def schools_geocode(inputs):
     return geo
 
 def geo_parser(geo):
+    """ 
+    Extracts relevant return fields from geocoding calls
+
+    Parameters: 
+    geo (dict): Full return from geosupport
+
+    Returns:
+    (dict): Contains geo_housenum, geo_streetname, geo_bbl,
+            geo_bin, geo_latitude, geo_longitude, geo_xy_coord,
+            geo_x_coord, geo_y_coord, geo_grc, geo_grc2, 
+            geo_reason_code, geo_message
+    """
     return dict(
         geo_housenum=geo.get("House Number - Display Format", ""),
         geo_streetname=geo.get("First Street Name Normalized", ""),
