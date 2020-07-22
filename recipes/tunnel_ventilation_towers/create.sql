@@ -1,3 +1,19 @@
+/*
+DESCRIPTION:
+    Read data from PSTDIN and transfer to EDM database
+INPUTS: 
+	PSTDIN >> 
+    TEMP temp(name text,
+        address text,
+        link text,
+        geom geometry
+    ) 
+OUTPUTS:
+	tunnel_ventilation_towers.latest(
+        Same schema as tmp
+    )
+*/
+
 CREATE TEMP TABLE tmp (
     name text,
     address text,
