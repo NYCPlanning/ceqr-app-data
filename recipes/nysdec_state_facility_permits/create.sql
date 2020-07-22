@@ -6,31 +6,7 @@ INPUTS:
 	PSTDIN >> 
     TEMP nysdec_state_facility_permits (
                         facility_name text,
-                        permit_id text,
-                        url_to_permit_text text,
-                        facility_location text,
-                        address text,
-                        housenum text,
-                        streetname text,
-                        streetname_1 text,
-                        streetname_2 text,
-                        facility_city text,
-                        facility_state text,
-                        borough text,
-                        zipcode text,
-                        issue_date date,
-                        expiration_date date,
-                        location text,
-                        geo_housenum text,
-                        geo_streetname text,
-                        geo_address text,
-                        geo_bbl bigint,
-                        geo_bin text,
-                        geo_latitude double precision,
-                        geo_longitude double precision,
-                        geo_x_coord double precision,
-                        geo_y_coord double precision,
-                        geo_function text
+                        ...
 )
 OUTPUTS:
 	nysdec_state_facility_permits.latest(
