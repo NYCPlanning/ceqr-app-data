@@ -10,6 +10,15 @@ from multiprocessing import Pool, cpu_count
 
 
 def _import() -> pd.DataFrame:
+    """ 
+    Import _sca_capacity_projects, apply corrections, and clean inputs. 
+
+    Returns: 
+    df (DataFrame): Contains sca capacity project 
+                    data with corrections applied
+                    and hnum and sname, parsed
+                    from address
+    """
     df = pd.read_csv('output/_sca_capacity_projects.csv')
     
     # Import csv to replace invalid addresses with manual corrections
@@ -30,6 +39,18 @@ def _import() -> pd.DataFrame:
     return df
     
 def _geocode(df: pd.DataFrame) -> pd.DataFrame:
+    """ 
+    Geocode cleaned sca data
+
+    Parameters: 
+    df (DataFrame): Contains sca capacity project 
+                    data with corrections applied
+                    and hnum and sname, parsed
+                    from address
+    Returns:
+    df (DataFrame): Contains input fields along
+                    with geosupport fields
+    """
     records = df.to_dict('records')
     del df
 
@@ -44,6 +65,17 @@ def _geocode(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 def _output(df):
+    """ 
+    Output geocoded data. 
+    
+    CSV contains all records. All except special
+    education schools get output to stdout for transfer
+    to postgres.
+
+    Parameters: 
+    df (DataFrame): Contains input fields along
+                    with geosupport fields
+    """
     cols = [
         "uid",
         "name",
