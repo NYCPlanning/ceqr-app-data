@@ -48,21 +48,9 @@ OUTPUTS:
                             geo_function text,
                             geom geometry)
     ),
-    sca_capactiy_projects.geo_rejects(uid text,
-                            name text,
-                            org_level text,
-                            district text,
-                            capacity bigint,
-                            pct_ps double precision,
-                            pct_is double precision,
-                            pct_hs double precision,
-                            guessed_pct boolean,
-                            start_date date,
-                            capital_plan text,
-                            borough text,
-                            address text,
-                            geo_function text,
-                            geom geometry)
+    sca_capactiy_projects.geo_rejects(
+            Same schema as sca_capacity_projects.latest
+    )
     )
 */
 
