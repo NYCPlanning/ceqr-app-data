@@ -1,3 +1,68 @@
+/*
+DESCRIPTION:
+   1. Load sca_bluebook and lcgms data, filtering out non-CEQR schools
+   2. Round enrollment fields to integers
+   3. Create geometry from lcgms coordinates
+   4. Combine input data
+   5. Output records in lcgms but not in bluebook to csv for research
+   6. Output records in both sources to PSTDIN for transfer to EDM database
+INPUTS: 
+    sca_bluebook.latest(
+        org_id,
+        organization_name,
+        bldg_id,
+        "bldg_excl.",
+        district,
+        subdistrict,
+        bldg_name,
+        org_e,
+        "ps_%" as ps_per,
+        "ms_%" as ms_per,
+        "hs_%" as hs_per,
+        charter,
+        org_level,
+        pc,
+        ic,
+        hc,
+        x,
+        y,
+        address
+    ),
+    doe_lcgms."2019_new"(
+        location_code,
+        location_name,
+        managed_by_name,
+        location_type_description,
+        location_category_description,
+        building_code,
+        building_name,
+        address_line_1,
+        borough_block_lot,
+        latitude,
+        longitude
+    )
+OUTPUTS:
+	TEMP tmp(
+        district, 
+        subdistrict, 
+        borocode,
+        bldg_name,
+        excluded,
+        bldg_id,
+        org_id,
+        org_level,
+        name,
+        address,
+        pc,
+        pe,
+        ic,
+        ie,
+        hc,
+        he,
+        geom
+    ) >> PSTDOUT
+*/
+
 CREATE TEMP TABLE tmp AS(
     WITH bluebook_filtered AS
         (SELECT 

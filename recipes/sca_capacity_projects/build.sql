@@ -1,3 +1,52 @@
+/*
+DESCRIPTION:
+    1. Standardize and concatenate the three sources of capacity project data
+    2. Assign capital plan year based on data source
+    3. Parse school name to determine the organization level
+    4. Using the org_level, estimate the proporiton of capacity in each level
+    5. Output the full source table to a csv for easy geocoding
+INPUTS: 
+	sca_capacity_projects_prev.latest(
+        district,
+        school,
+        borough,
+        address,
+        number_of_seats,
+        opening_&_anticipated_opening
+    ),
+    sca_capacity_projects_current.latest(
+        district,
+        school,
+        borough,
+        location,
+        capacity,
+        anticipated_opening
+    ),
+    sca_capacity_projects_tcu.latest(
+        district,
+        school,
+        borough,
+        location,
+        capacity,
+        anticipated_opening
+    )
+OUTPUTS:
+	TEMP tmp(uid,
+        name,
+        org_level,
+        district,
+        capacity,
+        pct_ps,
+        pct_is,
+        pct_hs,
+        guessed_pct,
+        start_date,
+        capital_plan,
+        borough,
+        address
+    ) >> _sca_capacity_projects.csv
+*/
+
 CREATE TEMP TABLE tmp as (
     WITH combined AS
         (SELECT
