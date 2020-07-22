@@ -6,12 +6,7 @@ INPUTS:
 	PSTDIN >> 
     TEMP tmp (
         content text,
-        icon text,
-        id text,
-        latitude double precision,
-        longitude double precision,
-        title text,
-        url text
+        ...
 )
 OUTPUTS:
 	dot_traffic_cameras.latest(
