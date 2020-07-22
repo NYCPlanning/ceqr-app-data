@@ -20,7 +20,6 @@ VERSION=$DATE
 
         # Write VERSION info
         echo "$VERSION" > version.txt
-        
     )
 
     Upload $NAME $VERSION
