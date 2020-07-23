@@ -5,7 +5,7 @@ sys.path.insert(0, "..")
 import pandas as pd
 import numpy as np
 import re
-from _helper.geo import get_hnum, get_sname, clean_address, geocode
+from _helper.geo import get_hnum, get_sname, clean_address, find_intersection, find_stretch, geocode
 from multiprocessing import Pool, cpu_count
 
 def _import() -> pd.DataFrame:
@@ -38,37 +38,44 @@ def _import() -> pd.DataFrame:
     df.to_csv("output/raw.csv", index=False)
 
     czb = pd.read_csv("../_data/city_zip_boro.csv", dtype=str, engine="c")
+    corr = pd.read_csv("../_data/air_corr.csv", dtype=str, engine="c")
+    corr_dict = corr.loc[corr.datasource == "nysdec_title_v_permits", :].to_dict('records')
 
     df.columns = [i.lower().replace(" ", "_") for i in df.columns]
     for col in cols:
         assert col in df.columns
-
-    # generate inputs for geocoding
     df = df.rename(columns={"facility_zip": "zipcode"})
+
+    # Get boro and limit to NYC
     df = df.loc[df.zipcode.isin(czb.zipcode.tolist()), :]
     df["borough"] = df.zipcode.apply(
         lambda x: czb.loc[czb.zipcode == x, "boro"].tolist()[0]
     )
+
+    # Apply corrections
+    for record in corr_dict:
+        df.loc[df['facility_location']==record['location'],'facility_location'] = record['correction'].upper()
     df["address"] = df["facility_location"].astype(str).apply(clean_address)
+
+    # Parse stretches
+    df[["streetname_1", "streetname_2","streetname_3"]] = df.apply(
+            lambda row: pd.Series(find_stretch(row['address'])), axis=1)
+    
+    # Parse intersections
+    df[["streetname_1", "streetname_2"]] = df.apply(
+            lambda row: pd.Series(find_intersection(row['address'])), axis=1)
+
+    # Parse house numbers
     df["hnum"] = (
         df["address"]
         .astype(str)
         .apply(get_hnum)
         .apply(lambda x: x.split("/", maxsplit=1)[0] if x != None else x)
     )
+
+    # Parse street names
     df["sname"] = df["address"].astype(str).apply(get_sname)
-    df["streetname_1"] = (
-        df["facility_location"]
-        .astype(str)
-        .apply(lambda x: clean_streetname(x, 0))
-        .apply(get_sname)
-    )
-    df["streetname_2"] = (
-        df["facility_location"]
-        .astype(str)
-        .apply(lambda x: clean_streetname(x, -1))
-        .apply(get_sname)
-    )
+    df.to_csv('output/pre-geocoding.csv')
     return df
 
 
