@@ -1,3 +1,91 @@
+/*
+DESCRIPTION:
+    1. Fiter nysdot traffic data to NYC counties
+    2. Assign borocode from county_code
+    3. Merge with nysdot_aadt to get geometries
+    4. Export to PSTDOUT for transfer to EDM database
+INPUTS: 
+	nysdot_traffic.latest(
+        rc_station,
+        count_stats_id,
+        rg,
+        region_code,
+        county_code,
+        cou,
+        stat,
+        rcsta,
+        ccst,
+        fc,
+        fg,
+        federal_direction,
+        f,
+        o,
+        calculation_year,
+        a,
+        aadt,
+        dhv,
+        ddhv,
+        su_aadt,
+        cu_aadt,
+        year_last_act,
+        aadt_last_act,
+        k_factor,
+        d_factor,
+        year_2last_act,
+        aadt_2last_act,
+        year_3last_act,
+        aadt_3last_act,
+        year_4last_act,
+        aadt_4last_act,
+        class_count_yr,
+        avg_wkday_f3_13,
+        act_avg_truck_perc,
+        act_avg_su_perc,
+        act_avg_cu_perc,
+        act_avg_mc_perc,
+        act_avg_car_perc,
+        act_avg_lt_perc,
+        act_avg_bus_perc,
+        avg_wkday_f5_7,
+        axle_factor,
+        su_peak,
+        cu_peak,
+        class_est_yr,
+        est_rg_fc_su,
+        est_rg_fc_cu,
+        est_rg_fc_truck,
+        est_rg_fc_su_peak,
+        est_rg_fc_cu_peak,
+        est_rg_fc_axle_factr,
+        est_fc_su,
+        est_fc_cu,
+        est_fc_truck,
+        est_fc_su_peak,
+        est_fc_cu_peak,
+        est_fc_axle_factr,
+        speed_count_yr,
+        speed_limit,
+        avg_speed,
+        perc_speed_50,
+        perc_speed_85,
+        exceeding_55,
+        exceeding_65,
+        avg_k_factor,
+        avg_d_factor,
+        dd_id
+    ),
+    nysdot_aadt.latest(
+        rc_id, 
+        wkb_geometry
+    )
+OUTPUTS:
+	TEMP tmp(
+        All fields from nysdot_traffic.latest input,
+        borocode,
+        geom
+    ) >> PSTDOUT
+*/
+
 CREATE TEMP TABLE tmp as (
     SELECT 
         a.rc_station,
