@@ -27,6 +27,18 @@ def clean_streetname(x, n):
 
 
 def _import() -> pd.DataFrame:
+    """
+    Download and format nysdec title v data from open data API
+    Gets raw data from API and saves to output/raw.csv
+    Checks raw data to ensure necessary columns are included
+    Gets boroughs from zipcodes, and cleans and parses addresses
+    Returns:
+    df (DataFrame): Contains fields facility_name,
+        permit_id, url_to_permit_text, facility_location,
+        facility_city, facility_state, zipcode, issue_date,
+        expiration_date, location, address, borough, 
+        hnum, sname, streetname_1, streetname_2
+    """
     url = "https://data.ny.gov/api/views/4n3a-en4b/rows.csv"
     cols = [
         "facility_name",
@@ -50,21 +62,19 @@ def _import() -> pd.DataFrame:
         assert col in df.columns
 
     # generate inputs for geocoding
-    df["zipcode"] = df["facility_zip"]
+    df = df.rename(columns={"facility_zip": "zipcode"})
     df = df.loc[df.zipcode.isin(czb.zipcode.tolist()), :]
     df["borough"] = df.zipcode.apply(
         lambda x: czb.loc[czb.zipcode == x, "boro"].tolist()[0]
     )
     df["address"] = df["facility_location"].astype(str).apply(clean_address)
-    df["housenum"] = (
+    df["hnum"] = (
         df["address"]
         .astype(str)
         .apply(get_hnum)
         .apply(lambda x: x.split("/", maxsplit=1)[0] if x != None else x)
     )
-    df["streetname"] = df["address"].astype(str).apply(get_sname)
-    df["sname"] = df["streetname"]
-    df["hnum"] = df["housenum"]
+    df["sname"] = df["address"].astype(str).apply(get_sname)
     df["streetname_1"] = (
         df["facility_location"]
         .astype(str)
@@ -129,6 +139,7 @@ def _output(df):
         "geo_y_coord",
         "geo_function",
     ]
+    df = df.rename(columns={"hnum":"housenum", "sname":"streetname"})
     df[cols].to_csv(sys.stdout, index=False)
 
 
