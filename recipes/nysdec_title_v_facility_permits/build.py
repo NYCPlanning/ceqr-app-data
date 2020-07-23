@@ -10,6 +10,9 @@ from multiprocessing import Pool, cpu_count
 
 
 def clean_address(x):
+    """ 
+    Replace NULL with '' and take first string before |,  &, @, AND 
+    """
     x = "" if x is None else x
     sep = ["|", "&", "@", " AND "]
     for i in sep:
@@ -18,6 +21,11 @@ def clean_address(x):
 
 
 def clean_streetname(x, n):
+    """ 
+    Replace NULL with ''
+    If street name contains an and, 
+    extrat the nth street name
+    """
     x = "" if x is None else x
     if ("&" in x) | (" AND " in x.upper()):
         x = re.split("&| AND | and ", x)[n]
@@ -27,6 +35,18 @@ def clean_streetname(x, n):
 
 
 def _import() -> pd.DataFrame:
+    """
+    Download and format nysdec title v data from open data API
+    Gets raw data from API and saves to output/raw.csv
+    Checks raw data to ensure necessary columns are included
+    Gets boroughs from zipcodes, and cleans and parses addresses
+    Returns:
+    df (DataFrame): Contains fields facility_name,
+        permit_id, url_to_permit_text, facility_location,
+        facility_city, facility_state, zipcode, issue_date,
+        expiration_date, location, address, borough, 
+        hnum, sname, streetname_1, streetname_2
+    """
     url = "https://data.ny.gov/api/views/4n3a-en4b/rows.csv"
     cols = [
         "facility_name",
@@ -50,21 +70,19 @@ def _import() -> pd.DataFrame:
         assert col in df.columns
 
     # generate inputs for geocoding
-    df["zipcode"] = df["facility_zip"]
+    df = df.rename(columns={"facility_zip": "zipcode"})
     df = df.loc[df.zipcode.isin(czb.zipcode.tolist()), :]
     df["borough"] = df.zipcode.apply(
         lambda x: czb.loc[czb.zipcode == x, "boro"].tolist()[0]
     )
     df["address"] = df["facility_location"].astype(str).apply(clean_address)
-    df["housenum"] = (
+    df["hnum"] = (
         df["address"]
         .astype(str)
         .apply(get_hnum)
         .apply(lambda x: x.split("/", maxsplit=1)[0] if x != None else x)
     )
-    df["streetname"] = df["address"].astype(str).apply(get_sname)
-    df["sname"] = df["streetname"]
-    df["hnum"] = df["housenum"]
+    df["sname"] = df["address"].astype(str).apply(get_sname)
     df["streetname_1"] = (
         df["facility_location"]
         .astype(str)
@@ -81,6 +99,17 @@ def _import() -> pd.DataFrame:
 
 
 def _geocode(df: pd.DataFrame) -> pd.DataFrame:
+    """ 
+    Geocode cleaned nysdec title v data using helper/air_geocode()
+
+    Parameters: 
+    df (DataFrame): Contains data  with
+                    hnum and sname parsed
+                    from address
+    Returns:
+    df (DataFrame): Contains input fields along
+                    with geosupport fields
+    """
     # geocoding
     records = df.to_dict("records")
     del df
@@ -101,6 +130,13 @@ def _geocode(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _output(df):
+    """ 
+    Output geocoded data to stdout for transfer to postgres
+
+    Parameters: 
+    df (DataFrame): Contains input fields along
+                    with geosupport fields
+    """
     cols = [
         "facility_name",
         "permit_id",
@@ -129,6 +165,7 @@ def _output(df):
         "geo_y_coord",
         "geo_function",
     ]
+    df = df.rename(columns={"hnum":"housenum", "sname":"streetname"})
     df[cols].to_csv(sys.stdout, index=False)
 
 
