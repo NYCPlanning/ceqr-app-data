@@ -1,4 +1,39 @@
-CREATE TEMP TABLE recode as (
+/*
+DESCRIPTION: 
+    1. recode transit modes
+        1. translate `lineno` to human readable modes
+        2. clean value and moe
+        3. filter and select records in NYC by fips codes
+        4. for each geoid, aggregate values, moes for 
+        different modes into jsonb objects 
+        
+        RECODE (
+            geoid text,
+            _val jsonb,
+            _moe jsonb
+        )
+    
+    2. Calculate MOE for combination variables (square root of sum of sqaures of moes)
+    3. Calculate VALUES for  combination variables (sum of values)
+    4. Merge into final output
+
+INPUT:
+    ctpp_mode_split_ny (
+        geoid text,
+        lineno text,
+        est text,
+        moe text
+    )
+
+OUTPUT: 
+    TEMP tmp (
+        geoid character varying,
+        value integer,
+        moe integer,
+        variable character varying
+    )
+*/
+CREATE TEMP TABLE RECODE as (
     SELECT
         geoid, 
         jsonb_object_agg(mode, value) as _val, 
@@ -68,6 +103,10 @@ CREATE TEMP TABLE tmp as (
                 COALESCE(POWER(b.trans_public_ferry, 2), 0)
             ) as trans_public_total
         FROM RECODE a, 
+            -- pivot jsonb to columns (key -> field name, value -> field value), 
+            -- this step is needed because not all tracts have all modes of travel
+            -- NULLs will be filled with 0s and calculated as 0s
+            this step will allow us to 
             jsonb_to_record(_moe) as  b(
                 trans_total numeric, trans_auto_solo numeric,
                 trans_auto_2 numeric, trans_auto_3 numeric,
@@ -119,6 +158,8 @@ CREATE TEMP TABLE tmp as (
             as trans_public_total
 
         FROM RECODE a, 
+            -- pivot jsonb to columns (key -> field name, value -> field value), 
+            -- this step is needed because not all tracts have all modes of travel
             jsonb_to_record(_val) as b(
                 trans_total numeric, trans_auto_solo numeric,
                 trans_auto_2 numeric, trans_auto_3 numeric,
