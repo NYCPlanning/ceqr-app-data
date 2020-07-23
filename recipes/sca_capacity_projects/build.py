@@ -5,7 +5,7 @@ sys.path.insert(0, "..")
 import pandas as pd
 import numpy as np
 import re
-from _helper.geo import get_hnum, get_sname, clean_house, clean_street, schools_geocode as geocode
+from _helper.geo import get_hnum, get_sname, clean_house, clean_street, geocode
 from multiprocessing import Pool, cpu_count
 
 

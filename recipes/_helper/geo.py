@@ -171,7 +171,13 @@ def air_geocode(inputs):
     geo.update(inputs)
     return geo
 
-def schools_geocode(inputs):
+class NotIntersection(Exception):
+    pass
+
+class NotStretch(Exception):
+    pass
+
+def geocode(inputs):
     """ 
     Runs cleaned & parsed address information through geosupport
 
@@ -214,10 +220,8 @@ def schools_geocode(inputs):
                 geo_to_y_coord = g['2'](node=geo_to_node).get('SPATIAL COORDINATES', {}).get('Y Coordinate', '')
                 geo.update(dict(geo_from_x_coord=geo_from_x_coord, geo_from_y_coord=geo_from_y_coord, geo_to_x_coord=geo_to_x_coord, geo_to_y_coord=geo_to_y_coord, geo_function='Segment'))
             else:
-                geo = g['1B'](street_name=sname, house_number=hnum, borough=borough)
-                geo = geo_parser(geo)
-                geo.update(dict(geo_function='1B'))
-        except:
+                raise NotStretch()
+        except (NotStretch, GeosupportError):
             try:
                 # Try to parse original address as an intersection
                 street_1, street_2 = find_intersection(inputs.get('address'))
@@ -227,10 +231,8 @@ def schools_geocode(inputs):
                     geo = geo_parser(geo)
                     geo.update(dict(geo_function='Intersection'))
                 else:
-                    geo = g['1B'](street_name=sname, house_number=hnum, borough=borough)
-                    geo = geo_parser(geo)
-                    geo.update(dict(geo_function='1B'))
-            except GeosupportError as e:
+                    raise NotIntersection()
+            except (NotIntersection, GeosupportError) as e:
                 geo = e.result
                 geo = geo_parser(geo)
                 geo.update(dict(geo_function=''))
