@@ -5,26 +5,8 @@ sys.path.insert(0, "..")
 import pandas as pd
 import numpy as np
 import re
-from _helper.geo import get_hnum, get_sname, air_geocode as geocode
+from _helper.geo import get_hnum, get_sname, clean_address, geocode
 from multiprocessing import Pool, cpu_count
-
-
-def clean_address(x):
-    x = "" if x is None else x
-    sep = ["|", "&", "@", " AND "]
-    for i in sep:
-        x = x.split(i, maxsplit=1)[0]
-    return x
-
-
-def clean_streetname(x, n):
-    x = "" if x is None else x
-    if ("&" in x) | (" AND " in x.upper()):
-        x = re.split("&| AND | and ", x)[n]
-    else:
-        x = ""
-    return x
-
 
 def _import() -> pd.DataFrame:
     url = "https://data.ny.gov/api/views/4n3a-en4b/rows.csv"
@@ -65,18 +47,6 @@ def _import() -> pd.DataFrame:
     df["streetname"] = df["address"].astype(str).apply(get_sname)
     df["sname"] = df["streetname"]
     df["hnum"] = df["housenum"]
-    df["streetname_1"] = (
-        df["facility_location"]
-        .astype(str)
-        .apply(lambda x: clean_streetname(x, 0))
-        .apply(get_sname)
-    )
-    df["streetname_2"] = (
-        df["facility_location"]
-        .astype(str)
-        .apply(lambda x: clean_streetname(x, -1))
-        .apply(get_sname)
-    )
     return df
 
 

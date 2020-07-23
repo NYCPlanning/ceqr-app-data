@@ -1,12 +1,7 @@
 import pandas as pd
 import numpy as np
 import sys
-
-
-def get_borocode(c):
-    borocode = {"New York": 1, "Bronx": 2, "Kings": 3, "Queens": 4, "Richmond": 5}
-    return borocode.get(c, "")
-
+from _helper.geo import get_borocode
 
 def _import() -> pd.DataFrame:
     url = "https://data.ny.gov/api/views/qcpj-zdb6/rows.csv"

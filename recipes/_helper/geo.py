@@ -46,6 +46,25 @@ def get_sname(address):
     else:
         return result
 
+def get_borocode(c):
+    """ 
+    Translate county name to borocode
+    """
+    borocode = {"NEW YORK": 1, "BRONX": 2, "KINGS": 3, "QUEENS": 4, "RICHMOND": 5}
+    return borocode.get(c.upper(), "")
+
+def clean_boro_name(b):
+    """ 
+    Clean one-word Staten Island and NULL out invalid borough names
+    """
+    if b == "STATENISLAND":
+        b = "STATEN ISLAND"
+    if b not in ["BRONX", "MANHATTAN", "BROOKLYN", "QUEENS", "STATEN ISLAND"]:
+        b = None
+    if b != None:
+        b = b.title()
+    return b
+
 def clean_house(s):
     """ 
     Transform house number to a geosupport-readable format
@@ -81,11 +100,24 @@ def clean_street(s):
     s (str): Cleaned street name
     """
     s = '' if s == None else s
+    s = "JFK INTERNATIONAL AIRPORT" if "JFK" in s else s
     s = re.sub(r"\([^)]*\)", "", s)\
         .replace("'","")\
+        .replace("VARIOUS", "")\
+        .replace("LOCATIONS", "")\
         .split("(",maxsplit=1)[0]\
         .split("/",maxsplit=1)[0]
     return s
+
+def clean_address(x):
+    """ 
+    Replace NULL with '' and take first string before |,  &, @, AND 
+    """
+    x = "" if x is None else x
+    sep = ["|", "&", "@", " AND "]
+    for i in sep:
+        x = x.split(i, maxsplit=1)[0]
+    return x
 
 def find_stretch(address):
     """ 
@@ -99,7 +131,7 @@ def find_stretch(address):
     street_2 (str): Bounding street 1
     street_3 (str): Bounding street 2
     """
-    if 'BETWEEN' in address:
+    if 'BETWEEN' in address.upper():
         street_1 = address.split('BETWEEN')[0].strip()
         street_2 = (address.split('BETWEEN')[1].split('AND')[0] + address.split(' ')[-1]).strip()
         street_3 = address.split('BETWEEN')[1].split('AND')[1].strip()
@@ -111,9 +143,12 @@ def find_intersection(address):
     """ 
     Finds addresses that indicate an intersection and spilts into two streets
     """
-    if 'AND' in address:
-        street_1 = address.split('AND')[0].strip()
-        street_2 = address.split('AND')[1].strip()
+    if ("&" in address.upper()) or \
+        (" AND " in address.upper()) or \
+        (" CROSS " in address.upper()) or \
+        (" CRS " in address.upper()):
+        street_1 = re.split("&| AND | and | CROSS | CRS", address)[0].strip()
+        street_2 = re.split("&| AND | and | CROSS | CRS", address)[1].strip()
         return street_1, street_2
     else:
         return '',''
@@ -195,10 +230,6 @@ def geocode(inputs):
     hnum = inputs.get('hnum', '')
     sname = inputs.get('sname', '')
     borough = inputs.get('borough', '')
-
-    hnum = str('' if hnum is None else hnum)
-    sname = str('' if sname is None else sname)
-    borough = str('' if borough is None else borough)
   
     try:
         # First try to geocode using 1B
@@ -209,34 +240,27 @@ def geocode(inputs):
         # Try to parse original address as a stretch
         try:
             street_1, street_2, street_3 = find_stretch(inputs.get('address'))
-            if (street_1 != '')&(street_2 != '')&(street_3 != ''):
-                # Call to geosupport function 3
-                geo = g['3'](street_name_1=street_1, street_name_2=street_2, street_name_3=street_3, borough_code=borough)
-                geo_from_node = geo.get('From Node', '')
-                geo_to_node = geo.get('To Node', '')
-                geo_from_x_coord = g['2'](node=geo_from_node).get('SPATIAL COORDINATES', {}).get('X Coordinate', '')
-                geo_from_y_coord = g['2'](node=geo_from_node).get('SPATIAL COORDINATES', {}).get('Y Coordinate', '')
-                geo_to_x_coord = g['2'](node=geo_to_node).get('SPATIAL COORDINATES', {}).get('X Coordinate', '')
-                geo_to_y_coord = g['2'](node=geo_to_node).get('SPATIAL COORDINATES', {}).get('Y Coordinate', '')
-                geo.update(dict(geo_from_x_coord=geo_from_x_coord, geo_from_y_coord=geo_from_y_coord, geo_to_x_coord=geo_to_x_coord, geo_to_y_coord=geo_to_y_coord, geo_function='Segment'))
-            else:
-                raise NotStretch()
-        except (NotStretch, GeosupportError):
+            # Call to geosupport function 3
+            geo = g['3'](street_name_1=street_1, street_name_2=street_2, street_name_3=street_3, borough_code=borough)
+            geo_from_node = geo.get('From Node', '')
+            geo_to_node = geo.get('To Node', '')
+            geo_from_x_coord = g['2'](node=geo_from_node).get('SPATIAL COORDINATES', {}).get('X Coordinate', '')
+            geo_from_y_coord = g['2'](node=geo_from_node).get('SPATIAL COORDINATES', {}).get('Y Coordinate', '')
+            geo_to_x_coord = g['2'](node=geo_to_node).get('SPATIAL COORDINATES', {}).get('X Coordinate', '')
+            geo_to_y_coord = g['2'](node=geo_to_node).get('SPATIAL COORDINATES', {}).get('Y Coordinate', '')
+            geo.update(dict(geo_from_x_coord=geo_from_x_coord, geo_from_y_coord=geo_from_y_coord, geo_to_x_coord=geo_to_x_coord, geo_to_y_coord=geo_to_y_coord, geo_function='Segment'))
+        except GeosupportError:
             try:
                 # Try to parse original address as an intersection
                 street_1, street_2 = find_intersection(inputs.get('address'))
-                if (street_1 != '')&(street_2 != ''):
-                    # Call to geosupport function 2
-                    geo = g['2'](street_name_1=street_1, street_name_2=street_2, borough_code=borough)
-                    geo = geo_parser(geo)
-                    geo.update(dict(geo_function='Intersection'))
-                else:
-                    raise NotIntersection()
-            except (NotIntersection, GeosupportError) as e:
+                # Call to geosupport function 2
+                geo = g['2'](street_name_1=street_1, street_name_2=street_2, borough_code=borough)
+                geo = geo_parser(geo)
+                geo.update(dict(geo_function='Intersection'))  
+            except GeosupportError as e:
                 geo = e.result
                 geo = geo_parser(geo)
                 geo.update(dict(geo_function=''))
-
     geo.update(inputs)
     return geo
 
