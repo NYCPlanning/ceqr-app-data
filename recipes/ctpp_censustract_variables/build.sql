@@ -41,7 +41,6 @@ CREATE TEMP TABLE RECODE as (
     FROM (
         SELECT 
             LEFT(split_part(geoid, 'US', 2),11) as geoid,
-            lineno AS variable,
             (CASE
                 WHEN lineno = '1' THEN 'trans_total'
                 WHEN lineno = '2' THEN 'trans_auto_solo'
@@ -106,7 +105,6 @@ CREATE TEMP TABLE tmp as (
             -- pivot jsonb to columns (key -> field name, value -> field value), 
             -- this step is needed because not all tracts have all modes of travel
             -- NULLs will be filled with 0s and calculated as 0s
-            this step will allow us to 
             jsonb_to_record(_moe) as  b(
                 trans_total numeric, trans_auto_solo numeric,
                 trans_auto_2 numeric, trans_auto_3 numeric,
@@ -189,7 +187,7 @@ CREATE TEMP TABLE tmp as (
         b.moe::numeric::integer as moe,
         a.variable
     FROM VAL a
-    FULL OUTER JOIN MOE b
+    JOIN MOE b
     ON a.geoid = b.geoid 
     AND a.variable = b.variable
 );
