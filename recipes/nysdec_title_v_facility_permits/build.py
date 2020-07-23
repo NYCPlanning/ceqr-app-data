@@ -10,6 +10,9 @@ from multiprocessing import Pool, cpu_count
 
 
 def clean_address(x):
+    """ 
+    Replace NULL with '' and take first string before |,  &, @, AND 
+    """
     x = "" if x is None else x
     sep = ["|", "&", "@", " AND "]
     for i in sep:
@@ -18,6 +21,11 @@ def clean_address(x):
 
 
 def clean_streetname(x, n):
+    """ 
+    Replace NULL with ''
+    If street name contains an and, 
+    extrat the nth street name
+    """
     x = "" if x is None else x
     if ("&" in x) | (" AND " in x.upper()):
         x = re.split("&| AND | and ", x)[n]
@@ -91,6 +99,17 @@ def _import() -> pd.DataFrame:
 
 
 def _geocode(df: pd.DataFrame) -> pd.DataFrame:
+    """ 
+    Geocode cleaned nysdec title v data using helper/air_geocode()
+
+    Parameters: 
+    df (DataFrame): Contains data  with
+                    hnum and sname parsed
+                    from address
+    Returns:
+    df (DataFrame): Contains input fields along
+                    with geosupport fields
+    """
     # geocoding
     records = df.to_dict("records")
     del df
@@ -111,6 +130,13 @@ def _geocode(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _output(df):
+    """ 
+    Output geocoded data to stdout for transfer to postgres
+
+    Parameters: 
+    df (DataFrame): Contains input fields along
+                    with geosupport fields
+    """
     cols = [
         "facility_name",
         "permit_id",
