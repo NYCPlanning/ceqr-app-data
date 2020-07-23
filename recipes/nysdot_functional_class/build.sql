@@ -1,3 +1,50 @@
+/*
+DESCRIPTION: 
+    Taking all fields from nysdot_functional_class that are 
+    spatially within NYC water included borough boundaries
+
+INPUT:
+    nysdot_functional_class (
+        ogc_fid                 integer,
+        objectid                integer,
+        route_no                character varying,
+        func_class              integer,
+        segment_name            character varying,
+        unique_id               integer,
+        roadway_type            double precision,
+        co_rd_no                character varying,
+        access_control          double precision,
+        bridge_feature_number   character varying,
+        hpms_sample_id          double precision,
+        jurisdiction            character varying,
+        last_actual_cntyr       double precision,
+        median_type             character varying,
+        mpo                     character varying,
+        municipality_type       character varying,
+        municipality_desc       character varying,
+        owning_juris            character varying,
+        ramp_dest_co_order      double precision,
+        ramp_orig_co_order      double precision,
+        shoulder_type           character varying,
+        strahnet                character varying,
+        surface_type            double precision,
+        tandem_truck            double precision,
+        toll                    character varying,
+        urban_area_code         character varying,
+        owned_by_muni_type      character varying,
+        from_date               character varying,
+        to_date                 character varying,
+        locerror                character varying,
+        "shape.stlength()"      double precision,
+        signing                 character varying,
+        wkb_geometry            geometry(MultiLineString,4326)
+    )
+OUTPUT:
+    TEMP tmp (
+        all fields in nysdot_functional_class
+        wkb_geometry rename to geom
+    )
+*/
 CREATE TEMP TABLE tmp as (
     WITH draft as (
         SELECT 

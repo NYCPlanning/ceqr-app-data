@@ -1,3 +1,20 @@
+/*
+DESCRIPTION:
+    We are taking all fields directly from nysdot_aadt.latest in RECIPES_ENGINE
+    nysdot_aadt is pulled from NYSDOT arcgis server using the following url: 
+    https://gis3.dot.ny.gov/arcgis/rest/services/TDV/MapServer/4/query?where=MUNI%3D%27CITY+OF+NEW+YORK%27&outFields=*&f=json
+
+INPUT:
+    nysdot_aadt.latest (
+        - you can see fields included below in the select statement
+        - Check create.sql for more detailed schema
+        - Note that wkb_geometry -> geometry(MultiLineString,4326)
+    )
+    
+OUTPUT: 
+    TEMP tmp in exact same schema 
+    as nysdot_aadt.latest
+*/
 CREATE TEMP TABLE tmp as (
     SELECT 
         enddesc,
