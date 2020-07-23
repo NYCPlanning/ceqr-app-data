@@ -206,12 +206,6 @@ def air_geocode(inputs):
     geo.update(inputs)
     return geo
 
-class NotIntersection(Exception):
-    pass
-
-class NotStretch(Exception):
-    pass
-
 def geocode(inputs):
     """ 
     Runs cleaned & parsed address information through geosupport
@@ -230,37 +224,49 @@ def geocode(inputs):
     hnum = inputs.get('hnum', '')
     sname = inputs.get('sname', '')
     borough = inputs.get('borough', '')
+    address = inputs.get('address', '')
   
     try:
         # First try to geocode using 1B
         geo = g['1B'](street_name=sname, house_number=hnum, borough=borough)
         geo = geo_parser(geo)
-        geo.update(geo_function='1B')
+        geo.update(streetname_1='', 
+                streetname_2='',
+                geo_function='1B')
     except GeosupportError:
-        # Try to parse original address as a stretch
         try:
-            street_1, street_2, street_3 = find_stretch(inputs.get('address'))
-            # Call to geosupport function 3
-            geo = g['3'](street_name_1=street_1, street_name_2=street_2, street_name_3=street_3, borough_code=borough)
-            geo_from_node = geo.get('From Node', '')
-            geo_to_node = geo.get('To Node', '')
-            geo_from_x_coord = g['2'](node=geo_from_node).get('SPATIAL COORDINATES', {}).get('X Coordinate', '')
-            geo_from_y_coord = g['2'](node=geo_from_node).get('SPATIAL COORDINATES', {}).get('Y Coordinate', '')
-            geo_to_x_coord = g['2'](node=geo_to_node).get('SPATIAL COORDINATES', {}).get('X Coordinate', '')
-            geo_to_y_coord = g['2'](node=geo_to_node).get('SPATIAL COORDINATES', {}).get('Y Coordinate', '')
-            geo.update(dict(geo_from_x_coord=geo_from_x_coord, geo_from_y_coord=geo_from_y_coord, geo_to_x_coord=geo_to_x_coord, geo_to_y_coord=geo_to_y_coord, geo_function='Segment'))
+            # Try to parse original address as an intersection
+            street_1, street_2 = find_intersection(address)
+            # Call to geosupport function 2
+            geo = g['2'](street_name_1=street_1, 
+                        street_name_2=street_2, 
+                        borough_code=borough)
+            geo = geo_parser(geo)
+            geo.update(dict(streetname_1=street_1, 
+                            streetname_2=street_2,
+                            geo_function='Intersection'))  
         except GeosupportError:
+            # Try to parse original address as a stretch
             try:
-                # Try to parse original address as an intersection
-                street_1, street_2 = find_intersection(inputs.get('address'))
-                # Call to geosupport function 2
-                geo = g['2'](street_name_1=street_1, street_name_2=street_2, borough_code=borough)
+                street_1, street_2, street_3 = find_stretch(address)
+                # Call to geosupport function 3
+                geo = g['3'](street_name_1=street_1, 
+                            street_name_2=street_2, 
+                            street_name_3=street_3, 
+                            borough_code=borough)
                 geo = geo_parser(geo)
-                geo.update(dict(geo_function='Intersection'))  
+                geo.update(dict(streetname=street_1, 
+                                streetname_1=street_2, 
+                                streetname_2=street_3,
+                                geo_from_x_coord=geo_from_x_coord, 
+                                geo_from_y_coord=geo_from_y_coord, 
+                                geo_to_x_coord=geo_to_x_coord, 
+                                geo_to_y_coord=geo_to_y_coord, 
+                                geo_function='Segment'))
             except GeosupportError as e:
-                geo = e.result
-                geo = geo_parser(geo)
-                geo.update(dict(geo_function=''))
+                    geo = e.result
+                    geo = geo_parser(geo)
+                    geo.update(dict(geo_function=''))     
     geo.update(inputs)
     return geo
 
@@ -277,7 +283,8 @@ def geo_parser(geo):
             geo_x_coord, geo_y_coord, geo_grc, geo_grc2, 
             geo_reason_code, geo_message
     """
-    return dict(
+    # Parse fields from 1B and intersection
+    parsed_geo = dict(
         geo_housenum=geo.get("House Number - Display Format", ""),
         geo_streetname=geo.get("First Street Name Normalized", ""),
         geo_bbl=geo.get("BOROUGH BLOCK LOT (BBL)", {}).get(
@@ -296,3 +303,26 @@ def geo_parser(geo):
         geo_reason_code=geo.get("Reason Code", ""),
         geo_message=geo.get("Message", "msg err"),
     )
+    try:
+        # Parse segment variables if they exist
+        parsed_geo.update(dict(
+            geo_from_node = geo.get('From Node', ''),
+            geo_to_node = geo.get('To Node', ''),
+            geo_from_x_coord = g['2'](node=geo_from_node).get('SPATIAL COORDINATES', {}).get('X Coordinate', ''),
+            geo_from_y_coord = g['2'](node=geo_from_node).get('SPATIAL COORDINATES', {}).get('Y Coordinate', ''),
+            geo_to_x_coord = g['2'](node=geo_to_node).get('SPATIAL COORDINATES', {}).get('X Coordinate', ''),
+            geo_to_y_coord = g['2'](node=geo_to_node).get('SPATIAL COORDINATES', {}).get('Y Coordinate', ''))
+        )
+    except:
+        # Keep dict "square" to translate DataFrame
+        parsed_geo.update(dict(
+            geo_from_node = '',
+            geo_to_node = '',
+            geo_from_x_coord = '',
+            geo_from_y_coord = '',
+            geo_to_x_coord = '',
+            geo_to_y_coord = ''
+        ))
+
+    return parsed_geo
+    
