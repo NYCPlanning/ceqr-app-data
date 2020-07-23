@@ -120,11 +120,11 @@ SELECT
 INTO :NAME.:"VERSION"
 FROM sca_capacity_projects;
 
-INSERT INTO :NAME."geo_rejects"
+DROP TABLE IF EXISTS :NAME."geo_rejects";
 SELECT *
+INTO :NAME."geo_rejects"
 FROM :NAME.:"VERSION"
-WHERE geom IS NULL
-AND name NOT IN (SELECT DISTINCT name FROM :NAME."geo_rejects");
+WHERE geom IS NULL;
 
 DELETE
 FROM :NAME.:"VERSION"
