@@ -105,7 +105,7 @@ SELECT
         WHEN geo_function = 'Intersection'
         THEN ST_TRANSFORM(ST_SetSRID(ST_MakePoint(geo_x_coord,geo_y_coord),2263),4326)
         -- Segments: Find the middle of the segment by creating a line from to/from coords
-        WHEN geo_function = 'Segment'
+        WHEN geo_function = 'Stretch'
         THEN ST_centroid(ST_MakeLine(
                 ST_TRANSFORM(ST_SetSRID(
                     ST_MakePoint(geo_from_x_coord::NUMERIC, geo_from_y_coord::NUMERIC),2263),4326),

@@ -75,7 +75,6 @@ def _import() -> pd.DataFrame:
 
     # Parse street names
     df["sname"] = df["address"].astype(str).apply(get_sname)
-    df.to_csv('output/pre-geocoding.csv')
     return df
 
 
