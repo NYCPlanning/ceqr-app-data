@@ -106,8 +106,6 @@ def _output(df: pd.DataFrame):
         "housenum",
         "streetname",
         "address",
-        "streetname_1",
-        "streetname_2",
         "borough",
         "geo_housenum",
         "geo_streetname",

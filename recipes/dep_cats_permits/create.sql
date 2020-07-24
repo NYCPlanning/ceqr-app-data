@@ -17,8 +17,6 @@ CREATE TEMP TABLE dep_cats_permits (
     housenum text,
     streetname text,
     address text,
-    streetname_1 text,
-    streetname_2 text,
     borough text,
     geo_housenum text,
     geo_streetname text,
@@ -37,10 +35,7 @@ CREATE TEMP TABLE dep_cats_permits (
 DROP TABLE IF EXISTS dep_cats_permits.:"VERSION" CASCADE;
 SELECT 
     *,
-    (CASE WHEN geo_function = 'Intersection'
-        THEN ST_TRANSFORM(ST_SetSRID(ST_MakePoint(geo_x_coord,geo_y_coord),2263),4326)
-        ELSE ST_SetSRID(ST_MakePoint(geo_longitude,geo_latitude),4326)
-    END)::geometry(Point,4326) as geom
+    ST_SetSRID(ST_MakePoint(geo_longitude,geo_latitude),4326) as geom
 INTO dep_cats_permits.:"VERSION"
 FROM dep_cats_permits
 WHERE TRIM(status) != 'CANCELLED'
