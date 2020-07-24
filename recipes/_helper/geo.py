@@ -111,10 +111,10 @@ def clean_street(s):
 
 def clean_address(x):
     """ 
-    Replace NULL with '' and take first string before | 
+    Replace NULL with '' and take first string before | and @
     """
     x = "" if x is None else x
-    return x.split('|', maxsplit=1)[0]
+    return x.split('|', maxsplit=1)[0].split('@', maxsplit=1)[0]
     
 def find_stretch(address):
     """ 
@@ -166,7 +166,7 @@ def geocode(inputs):
         See geo_parser() for full list of fields
     """
     hnum, sname, borough, street_name_1, street_name_2, street_name_3 = (
-        str("" if inputs[k] is None else inputs[k])
+        str("" if k not in inputs or inputs[k] is None else inputs[k])
         for k in ("hnum", "sname", "borough", "streetname_1", "streetname_2", "streetname_3")
     )
 
