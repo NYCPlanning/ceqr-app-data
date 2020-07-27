@@ -78,7 +78,7 @@ def clean_house(s):
     Returns:
     s (str): Cleaned house number
     """
-    s = ' ' if s == None else s
+    s = ' ' if s is None else s
     s = re.sub(r"\([^)]*\)", "", s)\
         .replace(' - ', '-')\
         .strip()\
@@ -99,7 +99,7 @@ def clean_street(s):
     Returns:
     s (str): Cleaned street name
     """
-    s = '' if s == None else s
+    s = '' if s is None else s
     s = "JFK INTERNATIONAL AIRPORT" if "JFK" in s else s
     s = re.sub(r"\([^)]*\)", "", s)\
         .replace("'","")\
@@ -129,9 +129,10 @@ def find_stretch(address):
     street_3 (str): Bounding street 2
     """
     if 'BETWEEN' in address.upper():
-        street_1 = address.split('BETWEEN')[0].strip()
-        street_2 = (address.split('BETWEEN')[1].split('AND')[0] + address.split(' ')[-1]).strip()
-        street_3 = address.split('BETWEEN')[1].split('AND')[1].strip()
+        street_1 = address.upper().split('BETWEEN')[0].strip()
+        bounding_streets = address.upper().split('BETWEEN')[1].strip()
+        street_2 = re.split("&| AND | and", bounding_streets)[0].strip()
+        street_3 = re.split("&| AND | and", bounding_streets)[1].strip()
         return street_1, street_2, street_3
     else:
         return '','',''
