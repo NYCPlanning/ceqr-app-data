@@ -4,7 +4,8 @@ sys.path.insert(0, "..")
 import pandas as pd
 import numpy as np
 import re
-from _helper.geo import get_hnum, get_sname, clean_street, clean_house, clean_boro_name, geocode
+from _helper.geo import get_hnum, get_sname, clean_street, clean_house, clean_boro_name, \
+                        find_stretch, find_intersection, geocode
 from multiprocessing import Pool, cpu_count
 
 def _import() -> pd.DataFrame:
@@ -50,16 +51,27 @@ def _import() -> pd.DataFrame:
         inplace=True,
     )
 
+    # Clean borough
     df["borough"] = df.borough.apply(clean_boro_name)
     df["borough"] = np.where(
         (df.streetname.str.contains("JFK")) & (df.borough == None), "Queens", df.borough
     )
 
-    df["address"] = df.housenum.astype(str).apply(clean_house) + \
-                    " " + df.streetname.astype(str).apply(clean_street)
-    df["hnum"] = df.address.apply(get_hnum)
-    df["sname"] = df.address.apply(get_sname)
+    # Clean house number & street names
+    df["hnum"] = df.housenum.astype(str).apply(clean_house)
+    df["sname"] = df.streetname.astype(str).apply(clean_street)
+
+    # Concatenate house & street to form full address
+    df["address"] = df.hnum + " " + df.sname
     
+    # Parse stretches
+    df[["streetname_1", "streetname_2", "streetname_3"]] = df.apply(
+            lambda row: pd.Series(find_stretch(row['address'])), axis=1)
+    
+    # Parse intersections
+    df[["streetname_1", "streetname_2"]] = df.apply(
+            lambda row: pd.Series(find_intersection(row['address'])), axis=1)
+
     df["status"] = df["status"].apply(lambda x: x.strip())
 
     return df
