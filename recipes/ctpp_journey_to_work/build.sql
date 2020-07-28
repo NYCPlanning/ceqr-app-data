@@ -1,3 +1,27 @@
+/*
+DESCRIPTION:
+    1. Get tract level origin, destination trip mode with traslated mode descriptions
+    2. filter relevant workplace_state_county
+
+INPUT: 
+    ctpp_journey_to_work (
+        res_tract               character varying,
+        work_tract              character varying,
+        mode                    character varying,
+        "totwork_16+"           character varying, 
+        standard_error          character varying,
+        workplace_state_county  character varying
+    )
+
+OUTPUT: 
+    TEMP tmp (
+        residential_geoid       character varying,
+        work_geoid              character varying,
+        "MODE"                  character varying,
+        count                   integer,
+        standard_error          double precision
+    )
+*/
 CREATE TEMP TABLE tmp as (
     SELECT 
         res_tract AS residential_geoid, 

@@ -6,12 +6,7 @@ VERSION=$DATE
 
 (
     cd $BASEDIR
-     docker run --rm\
-            -v $(pwd)/../:/recipes\
-            -e NAME=$NAME\
-            -e RECIPE_ENGINE=$RECIPE_ENGINE\
-            -w /recipes/$NAME\
-            nycplanning/cook:latest python3 build.py | 
+    psql -q $RECIPE_ENGINE -f build.sql| 
     psql $EDM_DATA -v NAME=$NAME -v VERSION=$VERSION -f create.sql
 
     mkdir -p output && 
@@ -25,7 +20,6 @@ VERSION=$DATE
 
         # Write VERSION info
         echo "$VERSION" > version.txt
-        
     )
 
     Upload $NAME $VERSION
