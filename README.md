@@ -6,7 +6,7 @@ This repository contains workflows to generate the data behind Planning Lab's Ci
 + 17: Air Quality
 
 ## General workflow
-Each chapter consists of several datasets, organized into 'recipes.' `/recipes`, you will find all of the pipelines currently maintained by Data Engineering. Within each pipeline, there will be a `build` script (either `.py`, `.sql`, or one of each), a `create.sql` script, and `runner.sh`. In general, the `build` scripts retrieve relevant columns from the input data, either by pulling from an open data source or by quering Data Engineering's RECIPE database. If needed, `build.py` geocodes the data. 
+Each chapter consists of several datasets, organized into 'recipes.' In `/recipes`, you will find all of the pipelines currently maintained by Data Engineering. Within each pipeline, there will be a `build` script (either `.py`, `.sql`, or one of each), a `create.sql` script, and `runner.sh`. In general, the `build` scripts retrieve relevant columns from the input data, either by pulling from an open data source or by quering Data Engineering's RECIPE database. If needed, `build.py` also geocodes the data. 
 
 This then gets passed to the EDM production database using `create.sql`, where final filtering, mapping, and geometry creation happens. Outputs also get pushed to a staging folder in DigitalOcean Spaces. Publishing from staging requires an additional call to the CLI.
 
@@ -43,7 +43,6 @@ e.g.
  + nysdot_functional_class:
  + nysdot_traffic_counts:
  + dot_traffic_cameras:
- + facilities_garages:
 
 ### 17. Air Quality
 + atypical_roadways: A roadway that is either elevated or depressed compared to the surrounding environment. Not on the same level. If site is 200 feet from an Atypical Roadway then this needs to be considered in the CEQR air analysis.
@@ -53,3 +52,4 @@ e.g.
 + nysdec_title_v_facility_permits:
 + tunnel_ventilation_towers:
 + dcp_areas_of_concern:
++ facilities_garages:
