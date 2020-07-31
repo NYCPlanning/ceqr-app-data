@@ -6,8 +6,9 @@ This repository contains workflows to generate the data behind Planning Lab's Ci
 + 17: Air Quality
 
 ## General workflow
-Each chapter consists of several datasets, organized into 'recipes.' In `/recipes`, you will find all of the pipelines currently maintained by Data Engineering. Each recipe is organized as follows:
+Each chapter consists of several datasets, organized into 'recipes.' In `/recipes`, you will find all of the pipelines currently maintained by Data Engineering. They are organized as follows:
 
+```
 recipes/
 ├── <dataset name>
 │   ├── build.sql (or build.py, or both)
@@ -17,6 +18,7 @@ recipes/
 │   │   ├── < shp output >.zip
 │   │   └── version.txt
 │   └── runner.sh
+```
 
 In general, the `build` scripts retrieve relevant columns from the input data, either by pulling from an open data source or by quering Data Engineering's RECIPE database. If needed, `build.py` also geocodes the data. 
 
