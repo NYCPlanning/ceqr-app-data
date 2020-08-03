@@ -1,3 +1,20 @@
+/*
+DESCRIPTION:
+    1. Import geocoded nysdec_state_facility_permits to EDM database using PSTDIN
+    2. Create geometry from geosupport fields
+INPUTS: 
+	PSTDIN >> 
+    TEMP nysdec_state_facility_permits (
+                        facility_name text,
+                        ...
+)
+OUTPUTS:
+	nysdec_state_facility_permits.latest(
+                            All fields from TEMP nysdec_state_facility_permits,
+                            geom geometry)
+    )
+*/
+
 CREATE TEMP TABLE nysdec_state_facility_permits (
     facility_name text,
     permit_id text,

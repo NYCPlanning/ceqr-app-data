@@ -8,6 +8,7 @@ import re
 from _helper.geo import get_hnum, get_sname, clean_address, find_intersection, find_stretch, geocode
 from multiprocessing import Pool, cpu_count
 
+
 def _import() -> pd.DataFrame:
     """
     Download and format nysdec state facility permit data from open data API
@@ -38,13 +39,17 @@ def _import() -> pd.DataFrame:
     df = pd.read_csv(url, dtype=str, engine="c", index_col=False)
     df.to_csv("output/raw.csv", index=False)
 
+    # Open lookup between zip codes and boroughs
     czb = pd.read_csv("../_data/city_zip_boro.csv", dtype=str, engine="c")
+
+    # Read and filter corrections file
     corr = pd.read_csv("../_data/air_corr.csv", dtype=str, engine="c")
     corr_dict = corr.loc[corr.datasource == "nysdec_state_facility_permits", :].to_dict('records')
 
     df.columns = [i.lower().replace(" ", "_") for i in df.columns]
     for col in cols:
         assert col in df.columns
+
     df = df.rename(columns={"expire_date": "expiration_date", "facility_zip": "zipcode"})
 
     # Get boro and limit to NYC
@@ -82,6 +87,17 @@ def _import() -> pd.DataFrame:
     return df
 
 def _geocode(df: pd.DataFrame) -> pd.DataFrame:
+    """ 
+    Geocode cleaned nysdec state facility permit data using helper/air_geocode()
+
+    Parameters: 
+    df (DataFrame): Contains data  with
+                    hnum and sname parsed
+                    from address
+    Returns:
+    df (DataFrame): Contains input fields along
+                    with geosupport fields
+    """
     # geocoding
     records = df.to_dict("records")
     del df
@@ -101,6 +117,12 @@ def _geocode(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 def _output(df):
+    """ 
+    Output geocoded data to stdout for transfer to postgres
+    Parameters: 
+    df (DataFrame): Contains input fields along
+                    with geosupport fields
+    """
     cols = [
         "facility_name",
         "permit_id",

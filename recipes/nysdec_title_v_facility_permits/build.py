@@ -79,6 +79,17 @@ def _import() -> pd.DataFrame:
 
 
 def _geocode(df: pd.DataFrame) -> pd.DataFrame:
+    """ 
+    Geocode cleaned nysdec title v data using helper/air_geocode()
+
+    Parameters: 
+    df (DataFrame): Contains data  with
+                    hnum and sname parsed
+                    from address
+    Returns:
+    df (DataFrame): Contains input fields along
+                    with geosupport fields
+    """
     # geocoding
     records = df.to_dict("records")
     del df
@@ -99,6 +110,13 @@ def _geocode(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _output(df):
+    """ 
+    Output geocoded data to stdout for transfer to postgres
+
+    Parameters: 
+    df (DataFrame): Contains input fields along
+                    with geosupport fields
+    """
     cols = [
         "facility_name",
         "permit_id",
