@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 import sys
+
+sys.path.insert(0, "..")
 from _helper.geo import get_borocode
 
 def _import() -> pd.DataFrame:
