@@ -57,6 +57,16 @@ SELECT
 INTO :NAME.:"VERSION"
 FROM nysdec_state_facility_permits;
 
+DROP TABLE IF EXISTS :NAME."geo_rejects";
+SELECT *
+INTO :NAME."geo_rejects"
+FROM :NAME.:"VERSION"
+WHERE geom IS NULL;
+
+DELETE
+FROM :NAME.:"VERSION"
+WHERE geom IS NULL;
+
 DROP VIEW IF EXISTS :NAME.latest;
 CREATE VIEW :NAME.latest AS (
     SELECT :'VERSION' as v, * 

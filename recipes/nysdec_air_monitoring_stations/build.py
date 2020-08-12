@@ -2,12 +2,8 @@ import pandas as pd
 import numpy as np
 import sys
 
-
-def get_borocode(c):
-    """ Translate county names to borough codes"""
-    borocode = {"New York": 1, "Bronx": 2, "Kings": 3, "Queens": 4, "Richmond": 5}
-    return borocode.get(c, "")
-
+sys.path.insert(0, "..")
+from _helper.geo import get_borocode
 
 def _import() -> pd.DataFrame:
     """

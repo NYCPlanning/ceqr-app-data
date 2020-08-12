@@ -46,6 +46,25 @@ def get_sname(address):
     else:
         return result
 
+def get_borocode(c):
+    """ 
+    Translate county name to borocode
+    """
+    borocode = {"NEW YORK": 1, "BRONX": 2, "KINGS": 3, "QUEENS": 4, "RICHMOND": 5}
+    return borocode.get(c.upper(), "")
+
+def clean_boro_name(b):
+    """ 
+    Clean one-word Staten Island and NULL out invalid borough names
+    """
+    if b == "STATENISLAND":
+        b = "STATEN ISLAND"
+    if b not in ["BRONX", "MANHATTAN", "BROOKLYN", "QUEENS", "STATEN ISLAND"]:
+        b = None
+    if b != None:
+        b = b.title()
+    return b
+
 def clean_house(s):
     """ 
     Transform house number to a geosupport-readable format
@@ -59,7 +78,7 @@ def clean_house(s):
     Returns:
     s (str): Cleaned house number
     """
-    s = ' ' if s == None else s
+    s = ' ' if s is None else s
     s = re.sub(r"\([^)]*\)", "", s)\
         .replace(' - ', '-')\
         .strip()\
@@ -80,13 +99,23 @@ def clean_street(s):
     Returns:
     s (str): Cleaned street name
     """
-    s = '' if s == None else s
+    s = '' if s is None else s
+    s = "JFK INTERNATIONAL AIRPORT" if "JFK" in s else s
     s = re.sub(r"\([^)]*\)", "", s)\
         .replace("'","")\
+        .replace("VARIOUS", "")\
+        .replace("LOCATIONS", "")\
         .split("(",maxsplit=1)[0]\
         .split("/",maxsplit=1)[0]
     return s
 
+def clean_address(x):
+    """ 
+    Replace NULL with '' and take first string before | and @
+    """
+    x = "" if x is None else x
+    return x.split('|', maxsplit=1)[0].split('@', maxsplit=1)[0]
+    
 def find_stretch(address):
     """ 
     Finds addresses that indicate a stretch and spilts into components
@@ -99,10 +128,11 @@ def find_stretch(address):
     street_2 (str): Bounding street 1
     street_3 (str): Bounding street 2
     """
-    if 'BETWEEN' in address:
-        street_1 = address.split('BETWEEN')[0].strip()
-        street_2 = (address.split('BETWEEN')[1].split('AND')[0] + address.split(' ')[-1]).strip()
-        street_3 = address.split('BETWEEN')[1].split('AND')[1].strip()
+    if 'BETWEEN' in address.upper():
+        street_1 = address.upper().split('BETWEEN')[0].strip()
+        bounding_streets = address.upper().split('BETWEEN')[1].strip()
+        street_2 = re.split("&| AND | and", bounding_streets)[0].strip()
+        street_3 = re.split("&| AND | and", bounding_streets)[1].strip()
         return street_1, street_2, street_3
     else:
         return '','',''
@@ -111,19 +141,22 @@ def find_intersection(address):
     """ 
     Finds addresses that indicate an intersection and spilts into two streets
     """
-    if 'AND' in address:
-        street_1 = address.split('AND')[0].strip()
-        street_2 = address.split('AND')[1].strip()
+    if ("&" in address.upper()) or \
+        (" AND " in address.upper()) or \
+        (" CROSS " in address.upper()) or \
+        (" CRS " in address.upper()):
+        street_1 = re.split("&| AND | and | CROSS | CRS ", address)[0].strip()
+        street_2 = re.split("&| AND | and | CROSS | CRS ", address)[1].strip()
         return street_1, street_2
     else:
         return '',''
 
 
-def air_geocode(inputs):
+def geocode(inputs):
     """ 
     Runs cleaned & parsed address information through geosupport
 
-    First attempt is 1B, then 1B-TPAD, then 2 
+    First attempt is 1B, then 1B-TPAD, then 2, then 3 
 
     Parameters: 
     inputs (dict): Contains address information
@@ -133,110 +166,68 @@ def air_geocode(inputs):
     geo (dict): Contains inputs as well as geosupport fields
         See geo_parser() for full list of fields
     """
-    hnum, sname, borough, street_name_1, street_name_2 = (
-        str("" if inputs[k] is None else inputs[k])
-        for k in ("hnum", "sname", "borough", "streetname_1", "streetname_2")
+    hnum, sname, borough, street_name_1, street_name_2, street_name_3 = (
+        str("" if k not in inputs or inputs[k] is None else inputs[k])
+        for k in ("hnum", "sname", "borough", "streetname_1", "streetname_2", "streetname_3")
     )
 
-    try:
-        geo = g["1B"](street_name=sname, house_number=hnum, borough=borough)
-        geo = geo_parser(geo)
-        geo.update(dict(geo_function="1B"))
-    except GeosupportError:
+    if street_name_1 != "":
+        if street_name_3 != "":
+            # Stretch: Geocode with 3
+            try:
+                geo = g['3'](street_name_1=street_name_1, 
+                            street_name_2=street_name_2, 
+                            street_name_3=street_name_3, 
+                            borough_code=borough)
+                geo = geo_parser(geo)
+                geo.update(inputs)
+                geo.update(dict(geo_function="Stretch"))
+                return geo
+            except GeosupportError as e:
+                geo = e.result
+                geo = geo_parser(geo)
+                geo.update(inputs)
+                geo.update(dict(geo_function="Stretch"))
+                return geo
+        else:
+            # Intersection: Geocode with 2
+            try:
+                geo = g['2'](street_name_1=street_name_1, 
+                            street_name_2=street_name_2, 
+                            borough_code=borough)
+                geo = geo_parser(geo)
+                geo.update(inputs)
+                geo.update(dict(geo_function='Intersection'))
+                return geo
+            except GeosupportError as e:
+                geo = e.result
+                geo = geo_parser(geo)
+                geo.update(inputs)
+                geo.update(dict(geo_function="Intersection"))
+                return geo
+    else:
+        # House + street: Try 1B without TPAD
         try:
-            geo = g["1B"](
-                street_name=sname, house_number=hnum, borough=borough, mode="tpad"
-            )
+            geo = g["1B"](street_name=sname, house_number=hnum, borough=borough)
             geo = geo_parser(geo)
-            geo.update(dict(geo_function="1B-tpad"))
+            geo.update(inputs)
+            geo.update(dict(geo_function="1B"))
+            return geo
         except GeosupportError:
+            # House + street: Try 1B with TPAD
             try:
-                if street_name_1 != "":
-                    geo = g["2"](
-                        street_name_1=street_name_1,
-                        street_name_2=street_name_2,
-                        borough_code=borough,
-                    )
-                    geo = geo_parser(geo)
-                    geo.update(dict(geo_function="Intersection"))
-                else:
-                    geo = g["1B"](street_name=sname, house_number=hnum, borough=borough)
-                    geo = geo_parser(geo)
-                    geo.update(dict(geo_function="1B"))
+                geo = g["1B"](
+                street_name=sname, house_number=hnum, borough=borough, mode="tpad")
+                geo = geo_parser(geo)
+                geo.update(inputs)
+                geo.update(dict(geo_function="1B-tpad"))
+                return geo
             except GeosupportError as e:
                 geo = e.result
                 geo = geo_parser(geo)
-                geo.update(dict(geo_function=""))
-
-    geo.update(inputs)
-    return geo
-
-def schools_geocode(inputs):
-    """ 
-    Runs cleaned & parsed address information through geosupport
-
-    First attempt is 1B, then attempts to parse stretch and run 3, then
-    attempts to parse intersection and run 2 
-
-    Parameters: 
-    inputs (dict): Contains address information
-        including hnum, sname, borough, address
-
-    Returns:
-    geo (dict): Contains inputs as well as geosupport fields
-        See geo_parser() for full list of fields
-    """
-    hnum = inputs.get('hnum', '')
-    sname = inputs.get('sname', '')
-    borough = inputs.get('borough', '')
-
-    hnum = str('' if hnum is None else hnum)
-    sname = str('' if sname is None else sname)
-    borough = str('' if borough is None else borough)
-  
-    try:
-        # First try to geocode using 1B
-        geo = g['1B'](street_name=sname, house_number=hnum, borough=borough)
-        geo = geo_parser(geo)
-        geo.update(geo_function='1B')
-    except GeosupportError:
-        # Try to parse original address as a stretch
-        try:
-            street_1, street_2, street_3 = find_stretch(inputs.get('address'))
-            if (street_1 != '')&(street_2 != '')&(street_3 != ''):
-                # Call to geosupport function 3
-                geo = g['3'](street_name_1=street_1, street_name_2=street_2, street_name_3=street_3, borough_code=borough)
-                geo_from_node = geo.get('From Node', '')
-                geo_to_node = geo.get('To Node', '')
-                geo_from_x_coord = g['2'](node=geo_from_node).get('SPATIAL COORDINATES', {}).get('X Coordinate', '')
-                geo_from_y_coord = g['2'](node=geo_from_node).get('SPATIAL COORDINATES', {}).get('Y Coordinate', '')
-                geo_to_x_coord = g['2'](node=geo_to_node).get('SPATIAL COORDINATES', {}).get('X Coordinate', '')
-                geo_to_y_coord = g['2'](node=geo_to_node).get('SPATIAL COORDINATES', {}).get('Y Coordinate', '')
-                geo.update(dict(geo_from_x_coord=geo_from_x_coord, geo_from_y_coord=geo_from_y_coord, geo_to_x_coord=geo_to_x_coord, geo_to_y_coord=geo_to_y_coord, geo_function='Segment'))
-            else:
-                geo = g['1B'](street_name=sname, house_number=hnum, borough=borough)
-                geo = geo_parser(geo)
-                geo.update(dict(geo_function='1B'))
-        except:
-            try:
-                # Try to parse original address as an intersection
-                street_1, street_2 = find_intersection(inputs.get('address'))
-                if (street_1 != '')&(street_2 != ''):
-                    # Call to geosupport function 2
-                    geo = g['2'](street_name_1=street_1, street_name_2=street_2, borough_code=borough)
-                    geo = geo_parser(geo)
-                    geo.update(dict(geo_function='Intersection'))
-                else:
-                    geo = g['1B'](street_name=sname, house_number=hnum, borough=borough)
-                    geo = geo_parser(geo)
-                    geo.update(dict(geo_function='1B'))
-            except GeosupportError as e:
-                geo = e.result
-                geo = geo_parser(geo)
-                geo.update(dict(geo_function=''))
-
-    geo.update(inputs)
-    return geo
+                geo.update(inputs)
+                geo.update(dict(geo_function="1B"))
+                return geo
 
 def geo_parser(geo):
     """ 
@@ -251,7 +242,8 @@ def geo_parser(geo):
             geo_x_coord, geo_y_coord, geo_grc, geo_grc2, 
             geo_reason_code, geo_message
     """
-    return dict(
+    # Parse fields from 1B and intersection
+    parsed_geo = dict(
         geo_housenum=geo.get("House Number - Display Format", ""),
         geo_streetname=geo.get("First Street Name Normalized", ""),
         geo_bbl=geo.get("BOROUGH BLOCK LOT (BBL)", {}).get(
@@ -270,3 +262,26 @@ def geo_parser(geo):
         geo_reason_code=geo.get("Reason Code", ""),
         geo_message=geo.get("Message", "msg err"),
     )
+    try:
+        # Parse segment variables if they exist
+        parsed_geo.update(dict(
+            geo_from_node = geo.get('From Node', ''),
+            geo_to_node = geo.get('To Node', ''),
+            geo_from_x_coord = g['2'](node=geo_from_node).get('SPATIAL COORDINATES', {}).get('X Coordinate', ''),
+            geo_from_y_coord = g['2'](node=geo_from_node).get('SPATIAL COORDINATES', {}).get('Y Coordinate', ''),
+            geo_to_x_coord = g['2'](node=geo_to_node).get('SPATIAL COORDINATES', {}).get('X Coordinate', ''),
+            geo_to_y_coord = g['2'](node=geo_to_node).get('SPATIAL COORDINATES', {}).get('Y Coordinate', ''))
+        )
+    except:
+        # Keep dict "square" to translate DataFrame
+        parsed_geo.update(dict(
+            geo_from_node = '',
+            geo_to_node = '',
+            geo_from_x_coord = '',
+            geo_from_y_coord = '',
+            geo_to_x_coord = '',
+            geo_to_y_coord = ''
+        ))
+
+    return parsed_geo
+    

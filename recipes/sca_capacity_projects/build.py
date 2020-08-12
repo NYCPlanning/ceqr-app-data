@@ -5,7 +5,8 @@ sys.path.insert(0, "..")
 import pandas as pd
 import numpy as np
 import re
-from _helper.geo import get_hnum, get_sname, clean_house, clean_street, schools_geocode as geocode
+from _helper.geo import get_hnum, get_sname, clean_address, find_intersection, find_stretch, geocode
+#from _helper.geo import get_hnum, get_sname, clean_house, clean_street, geocode
 from multiprocessing import Pool, cpu_count
 
 
@@ -31,9 +32,30 @@ def _import() -> pd.DataFrame:
     for record in cor_org_dict:
         df.loc[df['name']==record['school'],'org_level'] = record['org_level']
 
+    # Parse stretches
+    df[["streetname_1", "streetname_2","streetname_3"]] = df.apply(
+            lambda row: pd.Series(find_stretch(row['address'])), axis=1)
+    
+    # Parse intersections
+    df[["streetname_1", "streetname_2"]] = df.apply(
+            lambda row: pd.Series(find_intersection(row['address'])), axis=1)
+
+    # Parse house numbers
+    df["hnum"] = (
+        df["address"]
+        .astype(str)
+        .apply(get_hnum)
+        .apply(lambda x: x.split("/", maxsplit=1)[0] if x != None else x)
+    )
+
+    # Parse street names
+    df["sname"] = df["address"].astype(str).apply(get_sname)
+
+    '''
     # Clean inputs for geocoding
     df['hnum'] = df.address.apply(get_hnum).apply(lambda x: clean_house(x))
     df['sname'] = df.address.apply(get_sname).apply(lambda x: clean_street(x))
+    '''
 
     df.to_csv('output/_sca_capacity_project_corrected.csv')
     return df

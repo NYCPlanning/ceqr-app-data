@@ -57,14 +57,14 @@ CREATE TEMP TABLE dep_cats_permits (
 
 \COPY dep_cats_permits FROM PSTDIN DELIMITER '|' CSV HEADER;
 
-DROP TABLE IF EXISTS dep_cats_permits.:"VERSION" CASCADE;
+DROP TABLE IF EXISTS :NAME.:"VERSION" CASCADE;
 SELECT 
     *,
     (CASE WHEN geo_function = 'Intersection'
         THEN ST_TRANSFORM(ST_SetSRID(ST_MakePoint(geo_x_coord,geo_y_coord),2263),4326)
         ELSE ST_SetSRID(ST_MakePoint(geo_longitude,geo_latitude),4326)
     END)::geometry(Point,4326) as geom
-INTO dep_cats_permits.:"VERSION"
+INTO :NAME.:"VERSION"
 FROM dep_cats_permits
 WHERE TRIM(status) != 'CANCELLED'
 AND LEFT(applicationid, 1) != 'G'
@@ -76,8 +76,18 @@ AND (LEFT(applicationid, 2) != 'CA'
     OR requesttype != 'WORK PERMIT'
     OR TRIM(status) != 'EXPIRED');
 
-DROP VIEW IF EXISTS dep_cats_permits.latest;
-CREATE VIEW dep_cats_permits.latest AS (
+DROP TABLE IF EXISTS :NAME."geo_rejects";
+SELECT *
+INTO :NAME."geo_rejects"
+FROM :NAME.:"VERSION"
+WHERE geom IS NULL;
+
+DELETE
+FROM :NAME.:"VERSION"
+WHERE geom IS NULL;
+
+DROP VIEW IF EXISTS :NAME.latest;
+CREATE VIEW :NAME.latest AS (
     SELECT :'VERSION' as v, * 
-    FROM dep_cats_permits.:"VERSION"
+    FROM :NAME.:"VERSION"
 );

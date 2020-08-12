@@ -13,7 +13,7 @@ VERSION=$DATE
         -w /recipes/$NAME\
         --user $UID\
         nycplanning/docker-geosupport:latest python3 build.py | 
-    psql $EDM_DATA -v VERSION=$VERSION -f create.sql
+    psql $EDM_DATA -v NAME=$NAME -v VERSION=$VERSION -f create.sql
 
     (
         cd output
