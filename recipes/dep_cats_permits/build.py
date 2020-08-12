@@ -9,6 +9,21 @@ from _helper.geo import get_hnum, get_sname, clean_street, clean_house, clean_bo
 from multiprocessing import Pool, cpu_count
 
 def _import() -> pd.DataFrame:
+    """
+    Download and format DEP CATS permit data from open data API
+
+    Gets raw data from API and saves to output/raw.csv
+    Checks raw data to ensure necessary columns are included
+    Gets boroughs from zipcodes, and cleans and parses addresses
+
+    Returns:
+    df (DataFrame): Contains fields requestid, applicationid,
+        requesttype, housenum, hnum, streetname, sname, borough, 
+        bin, block, lot, ownername, expiration_date, make, 
+        model, burnermake, burnermodel, primaryfuel, secondaryfuel, 
+        quantity, issue_date, status, premisename, streetname_1,
+        streetname_2
+    """
     url = "https://data.cityofnewyork.us/api/views/f4rp-2kvy/rows.csv"
     cols = [
         "requestid",
@@ -31,7 +46,7 @@ def _import() -> pd.DataFrame:
         "quantity",
         "issuedate",
         "status",
-        "premisename",
+        "premisename"
     ]
 
     df = pd.read_csv(url, dtype=str, engine="c")
@@ -78,6 +93,17 @@ def _import() -> pd.DataFrame:
 
 
 def _geocode(df: pd.DataFrame) -> pd.DataFrame:
+    """ 
+    Geocode cleaned DEP CATS permit data using helper/geocode()
+
+    Parameters: 
+    df (DataFrame): Contains data  with
+                    hnum and sname parsed
+                    from address
+    Returns:
+    df (DataFrame): Contains input fields along
+                    with geosupport fields
+    """
     # geocoding
     records = df.to_dict("records")
     del df
@@ -98,6 +124,13 @@ def _geocode(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _output(df: pd.DataFrame):
+    """ 
+    Output geocoded data to stdout for transfer to postgres
+
+    Parameters: 
+    df (DataFrame): Contains input fields along
+                    with geosupport fields
+    """
     schema_name = "dep_cats_permits"
     cols = [
         "requestid",

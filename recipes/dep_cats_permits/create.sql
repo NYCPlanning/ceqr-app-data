@@ -1,3 +1,26 @@
+/*
+DESCRIPTION:
+    1. Import geocoded dep_cats_permits to EDM database using PSTDIN
+    2. Filter based on ID and request type
+        - exclude cancelled
+        - exclude G permits
+        - exclude C permits unless they are non-registrations
+        - exclude CA permits unless they are not work permits and not expired
+    3. Create geometry from geosupport fields
+    
+INPUTS: 
+	PSTDIN >> 
+    TEMP dep_cats_permits (
+                        requestid text,
+                        ...
+)
+OUTPUTS:
+	dep_cats_permits.latest(
+                            All fields from TEMP dep_cats_permits,
+                            geom geometry)
+    )
+*/
+
 CREATE TEMP TABLE dep_cats_permits (
     requestid text,
     applicationid text,
