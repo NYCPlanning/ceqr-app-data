@@ -35,4 +35,6 @@ VERSION=$DATE
             --user `id -u`:`id -g` \
             pandoc/latex README.md -o README.pdf
     )
+    Upload $NAME $VERSION
+    Upload $NAME latest
 )
