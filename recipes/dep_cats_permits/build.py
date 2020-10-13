@@ -7,6 +7,9 @@ import re
 from _helper.geo import get_hnum, get_sname, clean_street, clean_house, clean_boro_name, \
                         find_stretch, find_intersection, geocode
 from multiprocessing import Pool, cpu_count
+import datetime as dt
+from jinja2 import Template
+import requests
 
 def _import() -> pd.DataFrame:
     """
@@ -167,9 +170,23 @@ def _output(df: pd.DataFrame):
     ]
     df[cols].to_csv(sys.stdout, sep="|", index=False)
 
+def _readme():
+    date_last_update=dt.datetime.today().strftime("%B %d, %Y")
+    metadata=requests.get('https://data.cityofnewyork.us/api/views/f4rp-2kvy.json').json()
+    date_underlying_data=dt.datetime.fromtimestamp(metadata['rowsUpdatedAt']).strftime("%B %d, %Y")
+
+    with open('README.md', 'r') as readme:
+        template = Template(readme.read())
+        rendered = template.render(
+            date_last_update=date_last_update, 
+            date_underlying_data=date_underlying_data
+        )
+    with open('output/README.md', 'w') as _readme:
+        _readme.write(rendered)
 
 if __name__ == "__main__":
 
     df = _import()
     df = _geocode(df)
+    _readme()
     _output(df)

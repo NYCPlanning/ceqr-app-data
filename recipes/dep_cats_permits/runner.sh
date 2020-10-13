@@ -28,6 +28,11 @@ VERSION=$DATE
 
         # Write VERSION info
         echo "$VERSION" > version.txt
-        
+
+        # Convert README.md to README.pdf
+        docker run --rm\
+            -v "`pwd`:/data" \
+            --user `id -u`:`id -g` \
+            pandoc/latex README.md -o README.pdf
     )
 )
