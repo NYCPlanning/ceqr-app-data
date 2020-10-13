@@ -144,8 +144,11 @@ def _readme():
 
     with open('README.md', 'r') as readme:
         template = Template(readme.read())
-        rendered = template.render(date_last_update='variables', date_underlying_data='here')
-    with open('_README.md', 'w') as _readme:
+        rendered = template.render(
+            date_last_update=date_last_update, 
+            date_underlying_data=date_underlying_data
+        )
+    with open('output/README.md', 'w') as _readme:
         _readme.write(rendered)
 
 if __name__ == "__main__":
