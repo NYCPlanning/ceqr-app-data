@@ -33,8 +33,9 @@ VERSION=$DATE
         docker run --rm\
             -v "`pwd`:/data" \
             --user `id -u`:`id -g` \
-            pandoc/latex README.md -o README.pdf
+            pandoc/latex README.md -o ReadMe_DEPCATS.pdf
     )
     Upload $NAME $VERSION
     Upload $NAME latest
+    rm -rf output
 )

@@ -58,15 +58,35 @@ function Upload {
 }
 
 function Publish {
-  echo "publishing ceqr-app-data-staging/$1/$2"
-  mc rm -r --force spaces/edm-publishing/ceqr-app-data/$1/$2
-  mc cp -r spaces/edm-publishing/ceqr-app-data-staging/$1/$2 /tmp/ceqr-app-data-staging/$1/$2
-  mc cp -r /tmp/ceqr-app-data-staging/$1/$2 spaces/edm-publishing/ceqr-app-data/$1/$2
-
-  echo "promote $1/$2 to latest"
-  mc rm -r --force spaces/edm-publishing/ceqr-app-data/$1/latest 
-  mc cp -r /tmp/ceqr-app-data-staging/$1/$2 spaces/edm-publishing/ceqr-app-data/$1/latest
-  rm -rf /tmp/ceqr-app-data-staging/$1/$2
+  RECIPE=$1
+  VERSION=${2:-latest}
+  STAGING_PATH=spaces/edm-publishing/ceqr-app-data-staging/$1/$VERSION
+  VERSION_NAME=$(mc cat $STAGING_PATH/version.txt)
+  PUBLISH_PATH=spaces/edm-publishing/ceqr-app-data/$1/$VERSION_NAME
+  PUBLISH_PATH_LATEST=spaces/edm-publishing/ceqr-app-data/$1/latest
+  echo "
+    publishing  ceqr-app-data-staging/$1/$VERSION_NAME 
+    to          ceqr-app-data/$1/$VERSION_NAME
+  "
+  for INFO in $(mc ls --recursive --json $STAGING_PATH)
+  do
+    KEY=$(echo $INFO | jq -r '.key')
+    EXT="${KEY#*.}"
+    case $EXT in
+      txt | zip | csv | pdf | csv.zip | shp.zip )
+        mc cp $STAGING_PATH/$KEY /tmp/ceqr-app-data-staging/$1/$VERSION/$KEY
+        mc rm --force $PUBLISH_PATH/$KEY
+        # Copy to publish path
+        mc cp /tmp/ceqr-app-data-staging/$1/$VERSION/$KEY $PUBLISH_PATH/$KEY
+        # Promote to latest
+        mc cp /tmp/ceqr-app-data-staging/$1/$VERSION/$KEY $PUBLISH_PATH_LATEST/$KEY
+        rm -rf /tmp/ceqr-app-data-staging
+      ;;
+      *)
+        echo "skipping $KEY"
+      ;;
+    esac
+  done;
 }
 register 'publish' 'recipe' '{ recipe name } { version name } e.g. nysdot_aadt 2020-07-16' Publish
 
