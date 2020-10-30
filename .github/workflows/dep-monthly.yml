@@ -31,7 +31,7 @@ jobs:
           assignees: nnxka, sptkl
           labels: publish
           body: |
-            🎉 A fresh run of dep_cats_permits is complete !
+            A fresh run of dep_cats_permits is complete! 🎉
 
             ## Staging files output:
             - [ ] [version.txt](https://nyc3.digitaloceanspaces.com/edm-publishing/ceqr-app-data-staging/dep_cats_permits/latest/version.txt)
