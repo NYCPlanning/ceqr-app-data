@@ -30,7 +30,8 @@ jobs:
           title: |
             [publish] dep_cats_permits
           token: ${{secrets.GITHUB_TOKEN}}
-          assignees: nnxka, sptkl
+          assignees: |
+            ["nnxka", "sptkl", "mgraber"]
           labels: publish
           body: |
             A fresh run of dep_cats_permits is complete! 🎉
