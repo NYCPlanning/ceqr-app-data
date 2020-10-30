@@ -1,8 +1,9 @@
-name: Run CEQR Recipe
+name: Monthly Run DEP CATS permits
 on:
   schedule:
     - cron: 0 0 1 * *
-  
+  repository_dispatch:
+    types: [dep_cats_permits]
 jobs:
   build:
     runs-on: ubuntu-latest
