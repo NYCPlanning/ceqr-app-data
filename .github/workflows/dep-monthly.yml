@@ -27,7 +27,8 @@ jobs:
       - uses: nashmaniac/create-issue-action@v1.1
         name: Create Issue to Publish
         with:
-          title: [publish] dep_cats_permits
+          title: |
+            [publish] dep_cats_permits
           token: ${{secrets.GITHUB_TOKEN}}
           assignees: nnxka, sptkl
           labels: publish
