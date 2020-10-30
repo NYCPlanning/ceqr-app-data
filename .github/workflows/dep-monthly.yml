@@ -4,18 +4,8 @@ on:
     - cron: 0 0 1 * *
   
 jobs:
-  issueCheck:
-    runs-on: ubuntu-latest
-    steps:
-      - if: startsWith(github.event.issue.title, '[publish] dep_cats_permits') != 'true'
-        name: Close Issue
-        uses: peter-evans/close-issue@v1
-        with:
-          comment: |
-            Previous version unpublished, closing, so that we can generate a new version
   build:
     runs-on: ubuntu-latest
-    needs: issueCheck
     env:
       RECIPE_ENGINE: ${{ secrets.RECIPE_ENGINE }}
       EDM_DATA: ${{ secrets.EDM_DATA }}
@@ -50,6 +40,6 @@ jobs:
             - [ ] [ReadMe_DEPCATS.pdf](https://nyc3.digitaloceanspaces.com/edm-publishing/ceqr-app-data-staging/dep_cats_permits/latest/ReadMe_DEPCATS.pdf)
 
             ## Next Steps: 
-            If you have manually checked above files and they seem to be ok, comment publish under this issue. 
+            If you have manually checked above files and they seem to be ok, comment `[publish]` under this issue. 
             This would allow github actions to move staging files to production. 
             Feel free to close this issue once it's all complete. Thanks!
