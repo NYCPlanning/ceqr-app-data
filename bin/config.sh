@@ -48,7 +48,11 @@ function CSV_export {
 }
 
 function Upload {
-  mc rm -r --force spaces/edm-publishing/ceqr-app-data-staging/$1/$2
+  STATUS=$(mc stat --json spaces/edm-publishing/ceqr-app-data-staging/$1/$2 | jq -r '.status')
+  case $STATUS in
+    success) mc rm -r --force spaces/edm-publishing/ceqr-app-data-staging/$1/$2 ;;
+    error) true ;;
+  esac
   for file in output/*
   do
     name=$(basename $file)
