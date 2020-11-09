@@ -24,7 +24,7 @@ jobs:
       - name: Run recipe
         shell: bash
         run: |
-          title='${{ github.event.issue.title }}'
+          title=$(echo '${{ github.event.issue.title }}' | tr -d '\n')
           recipes=$(python -c "print('$title').replace('[publish] ', '')")
           for i in $(echo $recipes | tr " " "\n")
           do
