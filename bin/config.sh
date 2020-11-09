@@ -79,7 +79,11 @@ function Publish {
     case $EXT in
       txt | zip | csv | pdf | csv.zip | shp.zip )
         mc cp $STAGING_PATH/$KEY /tmp/ceqr-app-data-staging/$1/$VERSION/$KEY
-        mc rm --force $PUBLISH_PATH/$KEY
+        STATUS=$(mc stat --json $PUBLISH_PATH/$KEY | jq -r '.status')
+        case $STATUS in
+          success) mc rm -r --force $PUBLISH_PATH/$KEY ;;
+          error) true ;;
+        esac
         # Copy to publish path
         mc cp /tmp/ceqr-app-data-staging/$1/$VERSION/$KEY $PUBLISH_PATH/$KEY
         # Promote to latest
