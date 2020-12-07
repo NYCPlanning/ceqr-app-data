@@ -1,0 +1,121 @@
+type,borough,transit zone,day,trips,time,distribution,in,out
+Local Retail,Brooklyn,,weekday,205,AM,0.03,0.5,0.5
+Local Retail,Brooklyn,,weekday,205,MD,0.19,0.5,0.5
+Local Retail,Brooklyn,,weekday,205,PM,0.1,0.5,0.5
+Local Retail,Brooklyn,,weekend,240,SAT,0.1,0.5,0.5
+Local Retail,Manhattan,NTZ,weekday,205,AM,0.03,0.5,0.5
+Local Retail,Manhattan,NTZ,weekday,205,MD,0.19,0.5,0.5
+Local Retail,Manhattan,NTZ,weekday,205,PM,0.1,0.5,0.5
+Local Retail,Manhattan,NTZ,weekend,240,SAT,0.1,0.5,0.5
+Local Retail,Queens,TZ,weekday,205,AM,0.03,0.5,0.5
+Local Retail,Queens,TZ,weekday,205,MD,0.19,0.5,0.5
+Local Retail,Queens,TZ,weekday,205,PM,0.1,0.5,0.5
+Local Retail,Queens,TZ,weekend,240,SAT,0.1,0.5,0.5
+Local Retail,Queens,NTZ,weekday,205,AM,0.03,0.5,0.5
+Local Retail,Queens,NTZ,weekday,205,MD,0.19,0.5,0.5
+Local Retail,Queens,NTZ,weekday,205,PM,0.1,0.5,0.5
+Local Retail,Queens,NTZ,weekend,240,SAT,0.1,0.5,0.5
+Local Retail,Bronx,TZ,weekday,205,AM,0.03,0.5,0.5
+Local Retail,Bronx,TZ,weekday,205,MD,0.19,0.5,0.5
+Local Retail,Bronx,TZ,weekday,205,PM,0.1,0.5,0.5
+Local Retail,Bronx,TZ,weekend,240,SAT,0.1,0.5,0.5
+Local Retail,Bronx,NTZ,weekday,205,AM,0.03,0.5,0.5
+Local Retail,Bronx,NTZ,weekday,205,MD,0.19,0.5,0.5
+Local Retail,Bronx,NTZ,weekday,205,PM,0.1,0.5,0.5
+Local Retail,Bronx,NTZ,weekend,240,SAT,0.1,0.5,0.5
+Local Retail,Staten Island,,weekday,205,AM,0.03,0.5,0.5
+Local Retail,Staten Island,,weekday,205,MD,0.19,0.5,0.5
+Local Retail,Staten Island,,weekday,205,PM,0.1,0.5,0.5
+Local Retail,Staten Island,,weekend,240,SAT,0.1,0.5,0.5
+Hotel (M1),Manhattan,TZ,weekday,9.4,AM,0.08,0.34,0.66
+Hotel (M1),Manhattan,TZ,weekday,9.4,MD,0.14,0.46,0.54
+Hotel (M1),Manhattan,TZ,weekend,9.4,PM,0.13,0.57,0.43
+Hotel (M1),Manhattan,TZ,weekend,9.4,SAT,0.09,0.53,0.47
+Hotel (M1),Queens,TZ,weekday,9.4,AM,0.08,0.34,0.66
+Hotel (M1),Queens,TZ,weekday,9.4,MD,0.14,0.46,0.54
+Hotel (M1),Queens,TZ,weekend,9.4,PM,0.13,0.57,0.43
+Hotel (M1),Queens,TZ,weekend,9.4,SAT,0.09,0.53,0.47
+Hotel (M1),Brooklyn,TZ,weekday,9.4,AM,0.08,0.34,0.66
+Hotel (M1),Brooklyn,TZ,weekday,9.4,MD,0.14,0.46,0.54
+Hotel (M1),Brooklyn,TZ,weekend,9.4,PM,0.13,0.57,0.43
+Hotel (M1),Brooklyn,TZ,weekend,9.4,SAT,0.09,0.53,0.47
+Medical Office  < 15000,Brooklyn,TZ,weekday,76,AM,0.11,0.62,0.38
+Medical Office  < 15000,Brooklyn,TZ,weekday,76,MD,0.13,0.47,0.53
+Medical Office  < 15000,Brooklyn,TZ,weekend,76,PM,0.09,0.35,0.65
+Medical Office  < 15000,Brooklyn,TZ,weekend,39,SAT,0.17,0.49,0.51
+Medical Office  < 15000,Brooklyn,NTZ,weekday,76,AM,0.11,0.62,0.38
+Medical Office  < 15000,Brooklyn,NTZ,weekday,76,MD,0.13,0.47,0.53
+Medical Office  < 15000,Brooklyn,NTZ,weekend,76,PM,0.09,0.35,0.65
+Medical Office  < 15000,Brooklyn,NTZ,weekend,39,SAT,0.17,0.49,0.51
+Medical Office  < 15000,Manhattan,TZ,weekday,76,AM,0.11,0.62,0.38
+Medical Office  < 15000,Manhattan,TZ,weekday,76,MD,0.13,0.47,0.53
+Medical Office  < 15000,Manhattan,TZ,weekend,76,PM,0.09,0.35,0.65
+Medical Office  < 15000,Manhattan,TZ,weekend,39,SAT,0.17,0.49,0.51
+Medical Office  < 15000,Manhattan,NTZ,weekday,76,AM,0.11,0.62,0.38
+Medical Office  < 15000,Manhattan,NTZ,weekday,76,MD,0.13,0.47,0.53
+Medical Office  < 15000,Manhattan,NTZ,weekend,76,PM,0.09,0.35,0.65
+Medical Office  < 15000,Manhattan,NTZ,weekend,39,SAT,0.17,0.49,0.51
+Medical Office  < 15000,Queens,TZ,weekday,76,AM,0.11,0.62,0.38
+Medical Office  < 15000,Queens,TZ,weekday,76,MD,0.13,0.47,0.53
+Medical Office  < 15000,Queens,TZ,weekend,76,PM,0.09,0.35,0.65
+Medical Office  < 15000,Queens,TZ,weekend,39,SAT,0.17,0.49,0.51
+Medical Office  < 15000,Queens,NTZ,weekday,76,AM,0.11,0.62,0.38
+Medical Office  < 15000,Queens,NTZ,weekday,76,MD,0.13,0.47,0.53
+Medical Office  < 15000,Queens,NTZ,weekend,76,PM,0.09,0.35,0.65
+Medical Office  < 15000,Queens,NTZ,weekend,39,SAT,0.17,0.49,0.51
+Medical Office  < 15000,Bronx,TZ,weekday,76,AM,0.11,0.62,0.38
+Medical Office  < 15000,Bronx,TZ,weekday,76,MD,0.13,0.47,0.53
+Medical Office  < 15000,Bronx,TZ,weekend,76,PM,0.09,0.35,0.65
+Medical Office  < 15000,Bronx,TZ,weekend,39,SAT,0.17,0.49,0.51
+Medical Office  < 15000,Bronx,NTZ,weekday,76,AM,0.11,0.62,0.38
+Medical Office  < 15000,Bronx,NTZ,weekday,76,MD,0.13,0.47,0.53
+Medical Office  < 15000,Bronx,NTZ,weekend,76,PM,0.09,0.35,0.65
+Medical Office  < 15000,Bronx,NTZ,weekend,39,SAT,0.17,0.49,0.51
+Medical Office  < 15000,Staten Island,TZ,weekday,76,AM,0.11,0.62,0.38
+Medical Office  < 15000,Staten Island,TZ,weekday,76,MD,0.13,0.47,0.53
+Medical Office  < 15000,Staten Island,TZ,weekend,76,PM,0.09,0.35,0.65
+Medical Office  < 15000,Staten Island,TZ,weekend,39,SAT,0.17,0.49,0.51
+Medical Office  < 15000,Staten Island,NTZ,weekday,76,AM,0.11,0.62,0.38
+Medical Office  < 15000,Staten Island,NTZ,weekday,76,MD,0.13,0.47,0.53
+Medical Office  < 15000,Staten Island,NTZ,weekend,76,PM,0.09,0.35,0.65
+Medical Office  < 15000,Staten Island,NTZ,weekend,39,SAT,0.17,0.49,0.51
+Medical Office  > 15000,Brooklyn,TZ,weekday,66.626x + 141.77,AM,0.11,0.62,0.38
+Medical Office  > 15000,Brooklyn,TZ,weekday,66.626x + 141.77,MD,0.13,0.47,0.53
+Medical Office  > 15000,Brooklyn,TZ,weekend,66.626x + 141.77,PM,0.09,0.35,0.65
+Medical Office  > 15000,Brooklyn,TZ,weekend,39,SAT,0.17,0.49,0.51
+Medical Office  > 15000,Brooklyn,NTZ,weekday,66.626x + 141.77,AM,0.11,0.62,0.38
+Medical Office  > 15000,Brooklyn,NTZ,weekday,66.626x + 141.77,MD,0.13,0.47,0.53
+Medical Office  > 15000,Brooklyn,NTZ,weekend,66.626x + 141.77,PM,0.09,0.35,0.65
+Medical Office  > 15000,Brooklyn,NTZ,weekend,39,SAT,0.17,0.49,0.51
+Medical Office  > 15000,Manhattan,TZ,weekday,66.626x + 141.77,AM,0.11,0.62,0.38
+Medical Office  > 15000,Manhattan,TZ,weekday,66.626x + 141.77,MD,0.13,0.47,0.53
+Medical Office  > 15000,Manhattan,TZ,weekend,66.626x + 141.77,PM,0.09,0.35,0.65
+Medical Office  > 15000,Manhattan,TZ,weekend,39,SAT,0.17,0.49,0.51
+Medical Office  > 15000,Manhattan,NTZ,weekday,66.626x + 141.77,AM,0.11,0.62,0.38
+Medical Office  > 15000,Manhattan,NTZ,weekday,66.626x + 141.77,MD,0.13,0.47,0.53
+Medical Office  > 15000,Manhattan,NTZ,weekend,66.626x + 141.77,PM,0.09,0.35,0.65
+Medical Office  > 15000,Manhattan,NTZ,weekend,39,SAT,0.17,0.49,0.51
+Medical Office  > 15000,Queens,TZ,weekday,66.626x + 141.77,AM,0.11,0.62,0.38
+Medical Office  > 15000,Queens,TZ,weekday,66.626x + 141.77,MD,0.13,0.47,0.53
+Medical Office  > 15000,Queens,TZ,weekend,66.626x + 141.77,PM,0.09,0.35,0.65
+Medical Office  > 15000,Queens,TZ,weekend,39,SAT,0.17,0.49,0.51
+Medical Office  > 15000,Queens,NTZ,weekday,66.626x + 141.77,AM,0.11,0.62,0.38
+Medical Office  > 15000,Queens,NTZ,weekday,66.626x + 141.77,MD,0.13,0.47,0.53
+Medical Office  > 15000,Queens,NTZ,weekend,66.626x + 141.77,PM,0.09,0.35,0.65
+Medical Office  > 15000,Queens,NTZ,weekend,39,SAT,0.17,0.49,0.51
+Medical Office  > 15000,Bronx,TZ,weekday,66.626x + 141.77,AM,0.11,0.62,0.38
+Medical Office  > 15000,Bronx,TZ,weekday,66.626x + 141.77,MD,0.13,0.47,0.53
+Medical Office  > 15000,Bronx,TZ,weekend,66.626x + 141.77,PM,0.09,0.35,0.65
+Medical Office  > 15000,Bronx,TZ,weekend,39,SAT,0.17,0.49,0.51
+Medical Office  > 15000,Bronx,NTZ,weekday,66.626x + 141.77,AM,0.11,0.62,0.38
+Medical Office  > 15000,Bronx,NTZ,weekday,66.626x + 141.77,MD,0.13,0.47,0.53
+Medical Office  > 15000,Bronx,NTZ,weekend,66.626x + 141.77,PM,0.09,0.35,0.65
+Medical Office  > 15000,Bronx,NTZ,weekend,39,SAT,0.17,0.49,0.51
+Medical Office  > 15000,Staten Island,TZ,weekday,66.626x + 141.77,AM,0.11,0.62,0.38
+Medical Office  > 15000,Staten Island,TZ,weekday,66.626x + 141.77,MD,0.13,0.47,0.53
+Medical Office  > 15000,Staten Island,TZ,weekend,66.626x + 141.77,PM,0.09,0.35,0.65
+Medical Office  > 15000,Staten Island,TZ,weekend,39,SAT,0.17,0.49,0.51
+Medical Office  > 15000,Staten Island,NTZ,weekday,66.626x + 141.77,AM,0.11,0.62,0.38
+Medical Office  > 15000,Staten Island,NTZ,weekday,66.626x + 141.77,MD,0.13,0.47,0.53
+Medical Office  > 15000,Staten Island,NTZ,weekend,66.626x + 141.77,PM,0.09,0.35,0.65
+Medical Office  > 15000,Staten Island,NTZ,weekend,39,SAT,0.17,0.49,0.51
