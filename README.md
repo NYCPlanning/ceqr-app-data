@@ -1,9 +1,9 @@
 # CEQR Application Data Pipelines
 
 This repository contains workflows to generate the data behind Planning Lab's City Environmental Quality Review Application. Currently, Data Engineering generates the datasets for the following CEQR chapters:
-+ 6: Community Facilities
-+ 16: Transportation
-+ 17: Air Quality
++ 6- Community Facilities
++ 16- Transportation
++ 17- Air Quality
 
 ## General workflow
 Each chapter consists of several datasets, organized into 'recipes.' In `/recipes`, you will find all of the pipelines currently maintained by Data Engineering. They are organized as follows:
