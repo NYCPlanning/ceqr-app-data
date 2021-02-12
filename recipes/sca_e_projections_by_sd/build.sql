@@ -60,7 +60,7 @@ CREATE TEMP TABLE tmp as (
     WITH 
     UNPIVOT as (
 		SELECT
-		    a._col ->> 'borough' as district, 
+		    a._col ->> 'district' as district, 
 		    UPPER(REPLACE(b.key, 'grade_', '')) as projected,
 		    LEFT(a._col ->> 'year', 4) as school_year,
 		    (CASE WHEN b.key in ('pk','k','grade_1','grade_2','grade_3','grade_4','grade_5','grade_6') 
@@ -72,9 +72,9 @@ CREATE TEMP TABLE tmp as (
 		    
 		FROM (
 			SELECT row_to_json(row) as _col 
-			FROM (SELECT * FROM sca_e_projections."2020") row) a,
+			FROM (SELECT * FROM sca_e_projections.latest) row) a,
 			json_each_text(_col) as b
-		WHERE b.key not in ('ogc_fid', 'borough', 'data_type', 'year')),
+		WHERE b.key not in ('ogc_fid', 'district', 'data_type', 'year')),
 	MULTIPLY as (
         SELECT
             a.district, 
@@ -84,7 +84,7 @@ CREATE TEMP TABLE tmp as (
             a."ps"* b.multiplier::numeric as "ps",
             b.subdistrict
         FROM UNPIVOT a
-        FULL OUTER JOIN sca_e_pct."2020" b
+        FULL OUTER JOIN sca_e_pct.latest b
         ON a.district = b.district
         WHERE a.projected IN 
             ('PK','K','1','2','3',
