@@ -23,18 +23,24 @@ DESCRIPTION:
 INPUT:
     sca_e_projections.:"VERSION" (
         district character varying,
-        projected character varying,
-        "2018_19" character varying,
-        "2019_20" character varying,
-        "2020_21" character varying,
-        "2021_22" character varying,
-        "2022_23" character varying,
-        "2023_24" character varying,
-        "2024_25" character varying,
-        "2025_26" character varying,
-        "2026_27" character varying,
-        "2027_28" character varying,
-        "2028_29" character varying
+        data_type character varying,
+        year character varying,
+        pk character varying,
+        k character varying,
+        grade_1 character varying,
+        grade_2 character varying,
+        grade_3 character varying,
+        grade_4 character varying,
+        grade_5 character varying,
+        grade_6 character varying,
+        grade_7 character varying,
+        grade_8 character varying,
+        grade_9 character varying,
+        grade_10 character varying,
+        grade_11 character varying,
+        grade_12 character varying,
+        ged character varying,
+        total character varying
     )
 
     sca_e_pct.:"VERSION" (
