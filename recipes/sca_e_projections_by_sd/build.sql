@@ -23,18 +23,24 @@ DESCRIPTION:
 INPUT:
     sca_e_projections.:"VERSION" (
         district character varying,
-        projected character varying,
-        "2018_19" character varying,
-        "2019_20" character varying,
-        "2020_21" character varying,
-        "2021_22" character varying,
-        "2022_23" character varying,
-        "2023_24" character varying,
-        "2024_25" character varying,
-        "2025_26" character varying,
-        "2026_27" character varying,
-        "2027_28" character varying,
-        "2028_29" character varying
+        data_type character varying,
+        year character varying,
+        pk character varying,
+        k character varying,
+        grade_1 character varying,
+        grade_2 character varying,
+        grade_3 character varying,
+        grade_4 character varying,
+        grade_5 character varying,
+        grade_6 character varying,
+        grade_7 character varying,
+        grade_8 character varying,
+        grade_9 character varying,
+        grade_10 character varying,
+        grade_11 character varying,
+        grade_12 character varying,
+        ged character varying,
+        total character varying
     )
 
     sca_e_pct.:"VERSION" (
@@ -59,24 +65,23 @@ OUTPUT:
 CREATE TEMP TABLE tmp as (
     WITH 
     UNPIVOT as (
-        select 
-            a._col ->> 'district' as district, 
-            a._col ->> 'projected' as projected,
-            LEFT(b.key, 4) as school_year, 
-            (CASE WHEN a._col ->> 'projected' in 
-                    ('PK','K','1','2','3','4','5','6') 
-                THEN replace(b.value, ',', '')::integer 
-            END) as "ps",
-            (CASE WHEN a._col ->> 'projected' in ('7','8') 
-                THEN replace(b.value, ',', '')::integer 
-            END) as "is"
-        FROM (
-            select row_to_json(row) as _col 
-            from (select * from sca_e_projections."2019") row) a , 
-            json_each_text(_col) as b
-        where b.key not in ('ogc_fid', 'district', 'projected')
-    ),
-    MULTIPLY as (
+		SELECT
+		    a._col ->> 'district' as district, 
+		    UPPER(REPLACE(b.key, 'grade_', '')) as projected,
+		    LEFT(a._col ->> 'year', 4) as school_year,
+		    (CASE WHEN b.key in ('pk','k','grade_1','grade_2','grade_3','grade_4','grade_5','grade_6') 
+		           THEN replace(b.value, ',', '')::integer 
+		     END) as "ps",
+		    (CASE WHEN b.key in ('grade_7','grade_8') 
+		        THEN replace(b.value, ',', '')::integer 
+		    END) as "is"
+		    
+		FROM (
+			SELECT row_to_json(row) as _col 
+			FROM (SELECT * FROM sca_e_projections."2020") row) a,
+			json_each_text(_col) as b
+		WHERE b.key not in ('ogc_fid', 'district', 'data_type', 'year')),
+	MULTIPLY as (
         SELECT
             a.district, 
             a.school_year,
@@ -85,11 +90,12 @@ CREATE TEMP TABLE tmp as (
             a."ps"* b.multiplier::numeric as "ps",
             b.subdistrict
         FROM UNPIVOT a
-        FULL OUTER JOIN sca_e_pct."2019" b
+        FULL OUTER JOIN sca_e_pct."2020" b
         ON a.district = b.district
-        WHERE projected IN 
+        WHERE a.projected IN 
             ('PK','K','1','2','3',
             '4','5','6','7','8')
+        AND NOT a.district ~* 'HS'
     )
     SELECT
         school_year,
