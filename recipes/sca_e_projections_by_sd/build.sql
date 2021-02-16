@@ -78,7 +78,7 @@ CREATE TEMP TABLE tmp as (
 		    
 		FROM (
 			SELECT row_to_json(row) as _col 
-			FROM (SELECT * FROM sca_e_projections.latest) row) a,
+			FROM (SELECT * FROM sca_e_projections."2020") row) a,
 			json_each_text(_col) as b
 		WHERE b.key not in ('ogc_fid', 'district', 'data_type', 'year')),
 	MULTIPLY as (
@@ -90,7 +90,7 @@ CREATE TEMP TABLE tmp as (
             a."ps"* b.multiplier::numeric as "ps",
             b.subdistrict
         FROM UNPIVOT a
-        FULL OUTER JOIN sca_e_pct.latest b
+        FULL OUTER JOIN sca_e_pct."2020" b
         ON a.district = b.district
         WHERE a.projected IN 
             ('PK','K','1','2','3',
