@@ -13,9 +13,8 @@ def _import() -> pd.DataFrame:
     Returns:
     df (DataFrame): Contains fields 
     """
-    df = pd.read_csv(f"{do_s3_endpoint}/datasets/doe_pepmeetingurls/latest/doe_pepmeetingurls.csv", dtype=str, index_col=False)
+    df = pd.read_csv(f"{do_s3_endpoint}/datasets/doe_pepmeetingurls/latest/doe_pepmeetingurls.csv", dtype=str)
     df.fillna('', inplace=True)
-    df.to_csv("output/sharepoint_urls.csv")
     return df
 
 def _output(df):
@@ -25,7 +24,8 @@ def _output(df):
         "readable_url",
         "date"
     ]
-    df.to_csv(sys.stdout, sep='|', index=False)
+    df[cols].to_csv("output/sharepoint_urls.csv", sep='|', index=False)
+    df[cols].to_csv(sys.stdout, sep='|', index=False)
 
 if __name__ == "__main__":
     df = _import()

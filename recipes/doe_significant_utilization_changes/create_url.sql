@@ -6,4 +6,4 @@ CREATE TABLE doe_pepmeetingurls (
     date character varying
 );
 
-\COPY doe_pepmeetingurls FROM PSTDIN DELIMITER ',' CSV HEADER;
+\COPY doe_pepmeetingurls FROM PSTDIN DELIMITER '|' CSV HEADER;
