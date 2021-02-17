@@ -4,17 +4,30 @@ CREATE TEMP TABLE tmp (
     bldg_id_additional character varying,
     title character varying,
     at_scale_year character varying,
-    url character varying,
-    at_scale_enroll integer,
+    school_year character varying,
+    at_scale_enroll character varying,
     vote_date character varying
 );
 
 \COPY tmp FROM PSTDIN DELIMITER ',' CSV HEADER;
 
 DROP TABLE IF EXISTS :NAME.:"VERSION" CASCADE;
-SELECT *
+SELECT
+    a.bldg_id,
+    a.org_id,
+    a.bldg_id_additional,
+    a.title,
+    a.at_scale_year,
+    b.url,
+    b.readable_url,
+    a.school_year,
+    a.vote_date
 INTO :NAME.:"VERSION"
-FROM tmp;
+FROM tmp a
+JOIN doe_pepmeetingurls b
+ON a.school_year = b.school_year
+AND a.vote_date = b.date
+;
 
 DROP VIEW IF EXISTS :NAME.latest;
 CREATE VIEW :NAME.latest AS (
