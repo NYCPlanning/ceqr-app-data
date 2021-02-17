@@ -54,7 +54,7 @@ CREATE TEMP TABLE tmp as (
     JOIN doe_pepmeetingurls b
     ON a.school_year = b.school_year
     AND a.pep_vote = b.date
-    WHERE a.approved = 'Approved';
+    WHERE a.approved = 'Approved'
 );
 
 \COPY tmp TO PSTDOUT DELIMITER ',' CSV HEADER;
