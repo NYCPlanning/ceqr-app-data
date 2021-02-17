@@ -3,8 +3,7 @@ CREATE TABLE doe_pepmeetingurls (
     url character varying,
     school_year character varying,
     readable_url character varying,
-    date character varying,
-    join_key character varying
+    date character varying
 );
 
 \COPY doe_pepmeetingurls FROM PSTDIN DELIMITER ',' CSV HEADER;

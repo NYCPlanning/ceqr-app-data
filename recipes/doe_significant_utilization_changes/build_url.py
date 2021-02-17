@@ -15,7 +15,6 @@ def _import() -> pd.DataFrame:
     """
     df = pd.read_csv(f"{do_s3_endpoint}/datasets/doe_pepmeetingurls/latest/doe_pepmeetingurls.csv", dtype=str, index_col=False)
     df.fillna('', inplace=True)
-    df["join_key"] = df.apply(lambda row: f"{str(row['school_year'])} {str(row['date'])}", axis=1)
     df.to_csv("output/sharepoint_urls.csv")
     return df
 
@@ -24,8 +23,7 @@ def _output(df):
         "url",
         "school_year",
         "readable_url",
-        "date",
-        "join_key"
+        "date"
     ]
     df.to_csv(sys.stdout, sep='|', index=False)
 
