@@ -11,7 +11,7 @@ VERSION=$DATE
         -v $(pwd)/../:/recipes\
         -w /recipes/$NAME\
         --user $UID\
-        -e $DO_S3_ENDPOINT\
+        -e DO_S3_ENDPOINT=$DO_S3_ENDPOINT\
         nycplanning/docker-geosupport:latest python3 build_url.py | 
     psql $EDM_DATA -v NAME=$NAME -v VERSION=$VERSION -f create_url.sql
 
