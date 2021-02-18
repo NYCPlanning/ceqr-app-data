@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS :NAME;
+
 CREATE TEMP TABLE tmp (
     bldg_id character varying,
     org_id character varying,
@@ -19,14 +21,13 @@ SELECT
     a.title,
     a.at_scale_year,
     b.url,
-    b.readable_url,
-    a.school_year,
-    a.vote_date
+    a.at_scale_enroll,
+    TO_CHAR(TO_DATE(a.vote_date, 'MM/DD/YYYY'), 'YYYY-MM-DD') as vote_date
 INTO :NAME.:"VERSION"
 FROM tmp a
 JOIN doe_pepmeetingurls b
 ON a.school_year = b.school_year
-AND a.vote_date = b.date
+AND TO_CHAR(TO_DATE(a.vote_date, 'MM/DD/YYYY'), 'YYYY-MM-DD') = b.date
 ;
 
 DROP VIEW IF EXISTS :NAME.latest;

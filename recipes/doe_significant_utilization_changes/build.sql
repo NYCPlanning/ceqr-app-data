@@ -44,7 +44,7 @@ CREATE TEMP TABLE tmp as (
             regexp_replace(SPLIT_PART(at_scale_school_enrollment, '-', 1), '[^0-9]|\s', '', 'g'), 
             '')::integer as at_scale_enroll,
         pep_vote as vote_date
-    FROM doe_all_proposals."2021/02/17"
+    FROM doe_all_proposals."2021/02/18"
     WHERE approved = 'Approved'
 );
 
