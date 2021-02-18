@@ -7,12 +7,9 @@ VERSION=$DATE
 (
     cd $BASEDIR
 
-    docker run --rm\
-        -v $(pwd)/../:/recipes\
-        -w /recipes/$NAME\
-        --user $UID\
-        -e DO_S3_ENDPOINT=$DO_S3_ENDPOINT\
-        nycplanning/docker-geosupport:latest python3 build_url.py | 
+    curl -o doe_pepmeetingurls.csv $DO_S3_ENDPOINT/datasets/doe_pepmeetingurls/latest/doe_pepmeetingurls.csv
+
+    cat doe_pepmeetingurls.csv | 
     psql $EDM_DATA -v NAME=$NAME -v VERSION=$VERSION -f create_url.sql
 
     psql -q $RECIPE_ENGINE -f build.sql| 
