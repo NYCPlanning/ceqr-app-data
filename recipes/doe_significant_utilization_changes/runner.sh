@@ -7,7 +7,7 @@ VERSION=$DATE
 (
     cd $BASEDIR
 
-    curl -o doe_pepmeetingurls.csv $DO_S3_ENDPOINT/datasets/doe_pepmeetingurls/latest/doe_pepmeetingurls.csv
+    curl -o doe_pepmeetingurls.csv https://edm-recipes.nyc3.digitaloceanspaces.com/datasets/doe_pepmeetingurls/latest/doe_pepmeetingurls.csv
 
     cat doe_pepmeetingurls.csv | 
     psql $EDM_DATA -v NAME=$NAME -v VERSION=$VERSION -f create_url.sql
