@@ -5,11 +5,12 @@ on:
 
 jobs:
   push:
-    if: contains(github.event.issue.title, '[build]') &&
+    if: >- 
+      contains(github.event.issue.title, '[build]') && 
       (
-        github.event.issue.user.login == 'mgraber'||
-        github.event.issue.user.login == 'SPTKL'||
-        github.event.issue.author_association == 'MEMBER'
+        github.event.comment.user.login == 'mgraber'||
+        github.event.comment.user.login == 'SPTKL'||
+        github.event.comment.author_association == 'MEMBER'
       )
     runs-on: ubuntu-latest
     env:
@@ -24,22 +25,40 @@ jobs:
       - name: Install dependencies
         shell: bash
         run: ./ceqr setup
-        
+      
+      - name: Parse dataset names
+        shell: python
+        id: parsing
+        run: |
+          import os
+          
+          body = """${{ github.event.issue.body }}"""
+          splited = body.split('\n')
+          start = splited.index("```yml")+1
+          end = splited.index("```")
+          datasets=' '.join([i[2:] for i in splited[start:end]])
+          os.system('echo "::set-output name=datasets::{0}"'.format(datasets))
+                  
+      - name: Datasets to update...
+        run: echo "${{ steps.parsing.outputs.datasets }}"
+
       - name: Run recipes
         shell: bash
         run: |
-          title='${{ github.event.issue.title }}'
-          recipes=$(python -c "print('$title').replace('[build] ', '')")
-          for i in $(echo $recipes | tr " " "\n")
+          for i in ${{ steps.parsing.outputs.datasets }}
           do
             ./ceqr run recipe $i
           done
           
-      - name: Close Issue
-        if: ${{ success() }}
-        uses: peter-evans/close-issue@v1
+      - name: Success Message
+        if: success()
+        uses:  peter-evans/close-issue@v1
         with:
           issue-number: ${{ github.event.issue.number }}
           comment: |
-            # ${{ github.event.issue.title }} Is Successfully Updated! 🎉
-            for more details, check https://github.com/NYCPlanning/ceqr-app-data/actions/runs/${{ github.run_id }}
+            ## CEQR datasets successfully updated!
+            
+            ${{ steps.parsing.outputs.datasets }}
+            
+            *Updated by: @${{ github.actor }}* for more details, check https://github.com/NYCPlanning/ceqr-app-data/actions/runs/${{ github.run_id }}
+      
