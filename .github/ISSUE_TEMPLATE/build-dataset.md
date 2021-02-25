@@ -1,21 +1,23 @@
 ---
 name: Build Dataset
 about: Runs recipe to build specified recipe
-title: "[build] {place name of datasets here}"
+title: "[build]"
 labels: ''
 assignees: ''
 
 ---
 
+## Dataset(s)
+```yml
+- dep_cats_permits
+```
+
 ## Build notes
-Insert any notes you'd like here! Some ideas:
-+ Who are you?
-+ What recipe(s) are you running?
-+ Why are you running it/them?
+Insert any notes you'd like here!
 
-## Instructions
-
-To build a dataset, submit this issue with the [build] flag, along with the name(s) of datasets you'd like run. For example, `[build] dep_cats_permits` or `[build] nysdec_state_facility_permits nysdec_title_v_facility_permits`
+## Instructions 
+Add/change the name of the datasets to build. This will trigger the build of each of these datasets once the issue is opened.
+Feel free to close this issue once it's all complete. Thanks!
 
 Options include:
 + atypical_roadways
