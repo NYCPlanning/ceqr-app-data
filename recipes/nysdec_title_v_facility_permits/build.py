@@ -32,7 +32,7 @@ def _import() -> pd.DataFrame:
         "facility_zip",
         "issue_date",
         "expiration_date",
-        "location",
+        "georeference",
     ]
     df = pd.read_csv(url, dtype=str, engine="c", index_col=False)
     df.to_csv("output/raw.csv", index=False)
@@ -44,7 +44,7 @@ def _import() -> pd.DataFrame:
     df.columns = [i.lower().replace(" ", "_") for i in df.columns]
     for col in cols:
         assert col in df.columns, f"Missing {col} in input data"
-    df = df.rename(columns={"facility_zip": "zipcode"})
+    df = df.rename(columns={"facility_zip": "zipcode", "georeference":"location"})
 
     # Get boro and limit to NYC
     df = df.loc[df.zipcode.isin(czb.zipcode.tolist()), :]
@@ -146,6 +146,7 @@ def _output(df):
         "geo_function",
     ]
     df = df.rename(columns={"hnum":"housenum", "sname":"streetname"})
+    df[cols].to_csv('output/raw.csv', index=False)
     df[cols].to_csv(sys.stdout, index=False)
 
 
