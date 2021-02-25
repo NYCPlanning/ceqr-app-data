@@ -43,7 +43,7 @@ def _import() -> pd.DataFrame:
 
     df.columns = [i.lower().replace(" ", "_") for i in df.columns]
     for col in cols:
-        assert col in df.columns
+        assert col in df.columns, f"Missing {col} in input data"
     df = df.rename(columns={"facility_zip": "zipcode"})
 
     # Get boro and limit to NYC
