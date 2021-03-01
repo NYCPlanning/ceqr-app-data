@@ -54,7 +54,7 @@ def _import() -> pd.DataFrame:
 
     # Apply corrections
     for record in corr_dict:
-        df.loc[df['facility_location']==record['location'],'facility_location'] = record['correction'].upper()
+        df.loc[(df['facility_location']==record['location']) & (df['permit_id']==record['id']),'facility_location'] = record['correction'].upper()
     df["address"] = df["facility_location"].astype(str).apply(clean_address)
 
     # Parse stretches
