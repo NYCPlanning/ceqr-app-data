@@ -50,7 +50,7 @@ def _import() -> pd.DataFrame:
     for col in cols:
         assert col in df.columns, f"Missing {col} in input data"
 
-    df = df.rename(columns={"expire_date": "expiration_date", "facility_zip": "zipcode"})
+    df = df.rename(columns={"expire_date": "expiration_date", "facility_zip": "zipcode", "georeference":"location"})
 
     # Get boro and limit to NYC
     df = df.loc[df.zipcode.isin(czb.zipcode.tolist()), :]
@@ -60,7 +60,7 @@ def _import() -> pd.DataFrame:
 
     # Apply corrections
     for record in corr_dict:
-        df.loc[df['facility_location']==record['location'],'facility_location'] = record['correction'].upper()
+        df.loc[(df['facility_location']==record['location']) & (df['permit_id']==record['id']),'facility_location'] = record['correction'].upper()
 
     # Extract first location
     df["address"] = df["facility_location"].astype(str).apply(clean_address)
