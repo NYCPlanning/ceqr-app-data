@@ -54,7 +54,7 @@ def _import() -> pd.DataFrame:
 
     # Apply corrections to addresses
     for record in corr_dict:
-        if record['location'] != record['correction']:
+        if record['location'] != record['correction'].upper():
             df.loc[(df['facility_location']==record['location']) & (df['permit_id']==record['id']),'facility_location'] = record['correction'].upper()
     df["address"] = df["facility_location"].astype(str).apply(clean_address)
 
@@ -113,7 +113,7 @@ def correct_coords(df):
     corr = pd.read_csv("../_data/air_corr.csv", dtype=str, engine="c")
     corr_dict = corr.loc[corr.datasource == "nysdec_title_v_permits", :].to_dict('records')
     for record in corr_dict:
-        if record['location'] == record['correction']:
+        if record['location'] == record['correction'].upper():
             df.loc[(df['facility_location']==record['location']) & (df['permit_id']==record['id']),'geo_latitude'] = float(record['latitude'])
             df.loc[(df['facility_location']==record['location']) & (df['permit_id']==record['id']),'geo_longitude'] = float(record['longitude'])
             df.loc[(df['facility_location']==record['location']) & (df['permit_id']==record['id']),'geo_function'] = 'Manual Correction'
