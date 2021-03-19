@@ -8,6 +8,8 @@ import re
 from _helper.geo import get_hnum, get_sname, clean_address, find_intersection, find_stretch, geocode
 from multiprocessing import Pool, cpu_count
 
+CORR = pd.read_csv("../_data/air_corr.csv", dtype=str, engine="c")
+CORR_DICT = CORR.loc[CORR.datasource == "nysdec_state_facility_permits", :].to_dict('records')
 
 def _import() -> pd.DataFrame:
     """
@@ -42,10 +44,7 @@ def _import() -> pd.DataFrame:
     # Open lookup between zip codes and boroughs
     czb = pd.read_csv("../_data/city_zip_boro.csv", dtype=str, engine="c")
 
-    # Read and filter corrections file
-    corr = pd.read_csv("../_data/air_corr.csv", dtype=str, engine="c")
-    corr_dict = corr.loc[corr.datasource == "nysdec_state_facility_permits", :].to_dict('records')
-
+    # Check input columns and replace column names
     df.columns = [i.lower().replace(" ", "_") for i in df.columns]
     for col in cols:
         assert col in df.columns, f"Missing {col} in input data"
@@ -58,9 +57,10 @@ def _import() -> pd.DataFrame:
         lambda x: czb.loc[czb.zipcode == x, "boro"].tolist()[0]
     )
 
-    # Apply corrections
-    for record in corr_dict:
-        df.loc[(df['facility_location']==record['location']) & (df['permit_id']==record['id']),'facility_location'] = record['correction'].upper()
+    # Apply corrections to addresses
+    for record in CORR_DICT:
+        if record['location'] != record['correction'].upper():
+            df.loc[(df['facility_location']==record['location']) & (df['permit_id']==record['id']),'facility_location'] = record['correction'].upper()
 
     # Extract first location
     df["address"] = df["facility_location"].astype(str).apply(clean_address)
@@ -116,6 +116,14 @@ def _geocode(df: pd.DataFrame) -> pd.DataFrame:
     )
     return df
 
+def correct_coords(df):
+    for record in CORR_DICT:
+        if record['location'] == record['correction'].upper():
+            df.loc[(df['facility_location']==record['location']) & (df['permit_id']==record['id']),'geo_latitude'] = float(record['latitude'])
+            df.loc[(df['facility_location']==record['location']) & (df['permit_id']==record['id']),'geo_longitude'] = float(record['longitude'])
+            df.loc[(df['facility_location']==record['location']) & (df['permit_id']==record['id']),'geo_function'] = 'Manual Correction'
+    return df
+
 def _output(df):
     """ 
     Output geocoded data to stdout for transfer to postgres
@@ -159,4 +167,5 @@ def _output(df):
 if __name__ == "__main__":
     df = _import()
     df = _geocode(df)
+    df = correct_coords(df)
     _output(df)
