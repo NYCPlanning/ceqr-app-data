@@ -1,0 +1,75 @@
+name: Build CEQR Dataset
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      datasets:
+        description: 'List datasets to build, space-separated'
+        required: true
+        default: ''
+      publish:
+        description: 'Should this build get assigned to Labs for review? (yes/no)'
+        required: false
+        default: 'no'
+
+jobs:
+  push:
+    if: >- 
+      github.event_name == 'workflow_dispatch'
+      && 
+      (
+        github.event.issue.user.login == 'mgraber'||
+        github.event.issue.user.login == 'SPTKL'||
+        github.event.issue.author_association == 'MEMBER'
+      )
+    runs-on: ubuntu-latest
+    env:
+      RECIPE_ENGINE: ${{ secrets.RECIPE_ENGINE }}
+      EDM_DATA: ${{ secrets.EDM_DATA }}
+      AWS_S3_ENDPOINT: ${{ secrets.AWS_S3_ENDPOINT }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@v2
+        
+      - name: Install dependencies
+        shell: bash
+        run: ./ceqr setup
+
+      - name: Datasets to update...
+        run: echo "${{ github.event.inputs.datasets }}"
+
+      - name: Run recipes
+        shell: bash
+        run: |
+          for i in ${{ github.event.inputs.datasets }}
+          do
+            ./ceqr run recipe $i
+          done
+      
+      - uses: nashmaniac/create-issue-action@v1.1
+        name: Create Issue to Publish
+        if: github.event.inputs.publish == 'yes'
+        name: Create Issue to Publish
+        with: 
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const title = `[publish] ${{ github.event.inputs.datasets }}`;
+            const body = `
+            ## There are new versions available of the following dataset(s)
+            ## Dataset(s): 
+            ${{ github.event.inputs.datasets }}
+
+            ## Next Steps: 
+            If you have manually checked above files and they seem to be ok, comment \`[publish]\` under this issue. 
+            This would allow github actions to move staging files to production. 
+            Feel free to close this issue once it's all complete. Thanks!
+            `;
+            github.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              assignees: ["nnxka"],
+              labels: ['publish']
+            });
