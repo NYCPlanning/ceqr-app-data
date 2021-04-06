@@ -16,12 +16,6 @@ jobs:
   build:
     if: >- 
       github.event_name == 'workflow_dispatch'
-      && 
-      (
-        github.event.issue.user.login == 'mgraber'||
-        github.event.issue.user.login == 'SPTKL'||
-        github.event.issue.author_association == 'MEMBER'
-      )
     runs-on: ubuntu-latest
     env:
       RECIPE_ENGINE: ${{ secrets.RECIPE_ENGINE }}
