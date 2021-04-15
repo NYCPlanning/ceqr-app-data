@@ -2,16 +2,29 @@ name: Publish CEQR Recipe
 on:
   issue_comment:
     types: [created]
+  workflow_dispatch:
+    inputs:
+      dataset:
+        description: 'Input the name of dataset you would like to publish'
+        required: true
+        default: 'dep_cats_permits'
   
 jobs:
   publish:
     runs-on: ubuntu-latest
     if: >- 
-      contains(github.event.issue.title, '[publish]') && 
-      contains(github.event.comment.body, '[publish]') && 
+      ( 
+        github.event_name == 'issue_comment' &&
+        contains(github.event.issue.title, '[publish]') && 
+        contains(github.event.comment.body, '[publish]') && 
+        (
+          github.event.comment.user.login == 'nnxka'||
+          github.event.comment.author_association == 'MEMBER'
+        )
+      ) ||
       (
-        github.event.comment.user.login == 'nnxka'||
-        github.event.comment.author_association == 'MEMBER'
+        github.event_name == 'workflow_dispatch' &&
+        github.event.inputs.dataset != ''
       )
     env:
       AWS_S3_ENDPOINT: ${{ secrets.AWS_S3_ENDPOINT }}
@@ -24,18 +37,29 @@ jobs:
         shell: bash
         run: ./ceqr setup
         
-      - name: Run recipe
-        shell: bash
+      - name: Parse Name
+        if: github.event_name == 'issue_comment'
+        shell: python
+        id: parsing
         run: |
-          title=$(echo '${{ github.event.issue.title }}' | tr -d '\n')
-          recipes=$(python -c "print('$title').replace('[publish] ', '')")
-          for i in $(echo $recipes | tr " " "\n")
-          do
-            ./ceqr publish recipe $i
-          done
+          import os
+          
+          title = '''${{ github.event.issue.title }}'''
+          title = title.replace('[publish] ', '').replace('\n', '')
+          os.system('echo "::set-output name=dataset::{0}"'.format(title))
+          
+      - name: Run recipe
+        if: github.event_name == 'issue_comment'
+        shell: bash
+        run: ./ceqr publish recipe ${{ steps.parsing.outputs.dataset }}
+      
+      - name: Run Recipe
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: ./ceqr publish recipe ${{ github.event.inputs.dataset }}
                 
       - name: Success Message
-        if: success()
+        if: success() && github.event_name == 'issue_comment'
         uses: peter-evans/create-or-update-comment@v1
         with:
           comment-id: ${{ github.event.comment.id }}
