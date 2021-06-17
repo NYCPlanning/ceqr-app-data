@@ -73,7 +73,7 @@ CREATE TEMP TABLE tmp AS(
             district,
             subdistrict,
             bldg_name,
-            regexp_replace(enroll, '[^0-9]+', '', 'g') as org_e,
+            regexp_replace(org_e, '[^0-9]+', '', 'g') as org_e,
             "ps_%" as ps_per,
             "ms_%" as ms_per,
             "hs_%" as hs_per,
