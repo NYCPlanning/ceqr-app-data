@@ -29,7 +29,7 @@ CREATE TEMP TABLE tmp as (
         main_building_id as bldg_id,
         RIGHT(dbn, 4) as org_id,
         other_impacted_building as bldg_id_additional,
-        proposal_title as title,
+        proposal_title_ as title,
         at_scale_year as at_scale_year,
         (CASE 
             WHEN EXTRACT(month from pep_vote::timestamp) < 9
@@ -44,7 +44,7 @@ CREATE TEMP TABLE tmp as (
             regexp_replace(SPLIT_PART(at_scale_school_enrollment, '-', 1), '[^0-9]|\s', '', 'g'), 
             '')::integer as at_scale_enroll,
         pep_vote as vote_date
-    FROM doe_all_proposals."2021/02/18"
+    FROM doe_all_proposals."2021/06/17"
     WHERE approved = 'Approved'
 );
 
