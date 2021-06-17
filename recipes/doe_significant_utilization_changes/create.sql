@@ -22,12 +22,12 @@ SELECT
     a.at_scale_year,
     b.url,
     a.at_scale_enroll,
-    TO_CHAR(TO_DATE(a.vote_date, 'MM/DD/YYYY'), 'YYYY-MM-DD') as vote_date
+    TO_CHAR(TO_DATE(a.vote_date, 'MM/DD/YY'), 'YYYY-MM-DD') as vote_date
 INTO :NAME.:"VERSION"
 FROM tmp a
 JOIN doe_pepmeetingurls b
 ON a.school_year = b.school_year
-AND TO_CHAR(TO_DATE(a.vote_date, 'MM/DD/YYYY'), 'YYYY-MM-DD') = b.date
+AND TO_CHAR(TO_DATE(a.vote_date, 'MM/DD/YY'), 'YYYY-MM-DD') = b.date
 ;
 
 DROP VIEW IF EXISTS :NAME.latest;
