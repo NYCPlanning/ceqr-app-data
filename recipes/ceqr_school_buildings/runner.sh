@@ -7,7 +7,10 @@ VERSION=$DATE
 (
     cd $BASEDIR
     mkdir -p output
-    
+    endpoint=https://edm-recipes.nyc3.digitaloceanspaces.com
+    V=$(curl $endpoint/datasets/doe_lcgms/latest/config.json | jq -r '.dataset.version')
+    curl $endpoint/datasets/doe_lcgms/$V/doe_lcgms.sql | psql $EDM_DATA
+
     psql -q $RECIPE_ENGINE -f build.sql| 
     psql $EDM_DATA -v NAME=$NAME -v VERSION=$VERSION -f create.sql
 

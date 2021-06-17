@@ -126,7 +126,7 @@ CREATE TEMP TABLE tmp AS(
                 WHEN location_name ~* 'PORTABLE|MINI'
                     AND location_code||borough_block_lot IN
                     (SELECT location_code||borough_block_lot 
-                        FROM doe_lcgms.latest 
+                        FROM doe_lcgms 
                         WHERE location_name !~* 'PORTABLE'
                         AND location_name !~* 'MINI')
                 THEN 'Not Solo Mini or Portable'
@@ -149,7 +149,7 @@ CREATE TEMP TABLE tmp AS(
                     OR location_category_description = 'Ungraded'
                 THEN 'location_category_description is NULL or Ungraded'
             END as excluded
-        FROM doe_lcgms."2019_new"  
+        FROM doe_lcgms
     )
     SELECT
         b.district, 
