@@ -5,7 +5,7 @@ sys.path.insert(0, "..")
 import pandas as pd
 import numpy as np
 import re
-from _helper.geo import get_hnum, get_sname, clean_address, find_intersection, find_stretch, geocode
+from _helper.geo import get_hnum, get_sname, geocode
 #from _helper.geo import get_hnum, get_sname, clean_house, clean_street, geocode
 from multiprocessing import Pool, cpu_count
 
@@ -21,14 +21,6 @@ def _import() -> pd.DataFrame:
     """
     df = pd.read_csv('output/_ceqr_school_buildings.csv')
     
-    # Parse stretches
-    df[["streetname_1", "streetname_2","streetname_3"]] = df.apply(
-            lambda row: pd.Series(find_stretch(row['address'])), axis=1)
-    
-    # Parse intersections
-    df[["streetname_1", "streetname_2"]] = df.apply(
-            lambda row: pd.Series(find_intersection(row['address'])), axis=1)
-
     # Parse house numbers
     df["hnum"] = (
         df["primary_address"]
@@ -39,6 +31,9 @@ def _import() -> pd.DataFrame:
 
     # Parse street names
     df["sname"] = df["primary_address"].astype(str).apply(get_sname)
+
+    # Parse borough
+    df["borough"] = df["borough_block_lot"].astype(str).str[0]
 
     return df
     
