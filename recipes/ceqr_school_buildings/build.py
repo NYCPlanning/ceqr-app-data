@@ -12,13 +12,12 @@ from multiprocessing import Pool, cpu_count
 
 def _import() -> pd.DataFrame:
     """ 
-    Import _ceqr_school_buildings, apply corrections, and clean inputs. 
+    Import _ceqr_school_buildings
 
     Returns: 
-    df (DataFrame): Contains sca capacity project 
-                    data with corrections applied
-                    and hnum and sname, parsed
-                    from address
+    df (DataFrame): Contains combined lcgms and bluebook data
+                    with hnum and sname parsed
+                    from primary_address
     """
     df = pd.read_csv('output/_ceqr_school_buildings.csv')
     
@@ -45,13 +44,12 @@ def _import() -> pd.DataFrame:
     
 def _geocode(df: pd.DataFrame) -> pd.DataFrame:
     """ 
-    Geocode cleaned sca data
+    Geocode parsed school buildings data
 
     Parameters: 
-    df (DataFrame): Contains sca capacity project 
-                    data with corrections applied
-                    and hnum and sname, parsed
-                    from address
+    df (DataFrame): Contains combined lcgms and bluebook data
+                    with hnum and sname parsed
+                    from primary_address
     Returns:
     df (DataFrame): Contains input fields along
                     with geosupport fields
