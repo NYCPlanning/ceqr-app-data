@@ -8,7 +8,13 @@ VERSION=$DATE
     cd $BASEDIR
     mkdir -p output
     
-    psql -q $RECIPE_ENGINE -f build.sql| 
+    psql -q $RECIPE_ENGINE -f build.sql
+
+    docker run --rm\
+        -v $(pwd)/../:/recipes\
+        -w /recipes/$NAME\
+        --user $UID\
+        nycplanning/docker-geosupport:latest python3 build.py | 
     psql $EDM_DATA -v NAME=$NAME -v VERSION=$VERSION -f create.sql
 
     (

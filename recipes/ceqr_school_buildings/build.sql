@@ -38,8 +38,8 @@ INPUTS:
         --building_name,
         address_line_1,
         borough_block_lot,
-        latitude,
-        longitude
+        --latitude,
+        --longitude
     )
 OUTPUTS:
 	TEMP tmp(
@@ -120,8 +120,8 @@ CREATE TEMP TABLE tmp AS(
             --building_name,
             address_line_1,
             borough_block_lot,
-            latitude,
-            longitude,
+            --latitude,
+            --longitude,
             CASE
                 WHEN location_name ~* 'PORTABLE|MINI'
                     AND location_code||borough_block_lot IN
@@ -178,4 +178,4 @@ CREATE TEMP TABLE tmp AS(
 );
 
 \COPY (SELECT * FROM tmp WHERE district IS NULL AND subdistrict IS NULL) TO 'output/lcgms_not_in_bluebook.csv' DELIMITER ',' CSV HEADER;
-\COPY (SELECT * FROM tmp WHERE district IS NOT NULL AND subdistrict IS NOT NULL) TO PSTDOUT DELIMITER ',' CSV HEADER;
+\COPY (SELECT * FROM tmp WHERE district IS NOT NULL AND subdistrict IS NOT NULL) TO 'output/_ceqr_school_buildings.csv' DELIMITER ',' CSV HEADER;
