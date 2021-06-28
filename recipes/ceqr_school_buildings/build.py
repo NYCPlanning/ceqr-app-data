@@ -33,7 +33,7 @@ def _import() -> pd.DataFrame:
     df["sname"] = df["address"].astype(str).apply(get_sname)
 
     # Parse borough
-    df["borough"] = df["borough_block_lot"].astype(str).str[0]
+    df["borough"] = df["borocode"]
 
     return df
     
