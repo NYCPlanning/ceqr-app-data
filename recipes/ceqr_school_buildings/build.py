@@ -19,7 +19,7 @@ def _import() -> pd.DataFrame:
                     with hnum and sname parsed
                     from address
     """
-    df = pd.read_csv('output/_ceqr_school_buildings.csv')
+    df = pd.read_csv('output/_ceqr_school_buildings.csv', sep='|')
     
     # Parse house numbers
     df["hnum"] = (
