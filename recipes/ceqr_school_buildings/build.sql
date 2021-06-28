@@ -79,9 +79,9 @@ CREATE TEMP TABLE tmp AS(
             "hs_%" as hs_per,
             charter,
             org_level,
-            pc,
-            ic,
-            hc,
+            REPLACE(pc,',','') as pc,
+            REPLACE(ic,',','') as ic,
+            REPLACE(hc,',','') as hc,
             x,
             y,
             address,
@@ -149,7 +149,7 @@ CREATE TEMP TABLE tmp AS(
                     OR location_category_description = 'Ungraded'
                 THEN 'location_category_description is NULL or Ungraded'
             END as excluded
-        FROM doe_lcgms."2019_new"  
+        FROM doe_lcgms.latest 
     )
     SELECT
         b.district, 
