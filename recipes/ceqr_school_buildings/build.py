@@ -17,23 +17,23 @@ def _import() -> pd.DataFrame:
     Returns: 
     df (DataFrame): Contains combined lcgms and bluebook data
                     with hnum and sname parsed
-                    from primary_address
+                    from address
     """
-    df = pd.read_csv('output/_ceqr_school_buildings.csv')
+    df = pd.read_csv('output/_ceqr_school_buildings.csv', sep='|')
     
     # Parse house numbers
     df["hnum"] = (
-        df["primary_address"]
+        df["address"]
         .astype(str)
         .apply(get_hnum)
         .apply(lambda x: x.split("/", maxsplit=1)[0] if x != None else x)
     )
 
     # Parse street names
-    df["sname"] = df["primary_address"].astype(str).apply(get_sname)
+    df["sname"] = df["address"].astype(str).apply(get_sname)
 
     # Parse borough
-    df["borough"] = df["borough_block_lot"].astype(str).str[0]
+    df["borough"] = df["borocode"]
 
     return df
     
@@ -44,7 +44,7 @@ def _geocode(df: pd.DataFrame) -> pd.DataFrame:
     Parameters: 
     df (DataFrame): Contains combined lcgms and bluebook data
                     with hnum and sname parsed
-                    from primary_address
+                    from address
     Returns:
     df (DataFrame): Contains input fields along
                     with geosupport fields
