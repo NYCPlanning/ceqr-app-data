@@ -44,13 +44,42 @@ CREATE TEMP TABLE tmp (
     ie integer,
     hc integer,
     he integer,
-    geom geometry(Point,4326)
+    geo_xy_coord text,
+    geo_x_coord double precision,
+    geo_y_coord double precision,
+    geo_from_x_coord double precision,
+    geo_from_y_coord double precision,
+    geo_to_x_coord double precision,
+    geo_to_y_coord double precision,
+    geo_function text,
+    geo_grc text,
+    geo_grc2 text,
+    geo_reason_code text,
+    geo_message text
 );
 
 \COPY tmp FROM PSTDIN DELIMITER ',' CSV HEADER;
 
 DROP TABLE IF EXISTS :NAME.:"VERSION" CASCADE;
-SELECT *
+SELECT 
+    district,
+    subdistrict,
+    borocode,
+    bldg_name,
+    excluded,
+    bldg_id,
+    org_id,
+    org_level,
+    "name",
+    "address",
+    pc,
+    pe,
+    ic,
+    ie,
+    hc,
+    he,
+    (ST_TRANSFORM(ST_SetSRID(ST_MakePoint(LEFT(geo_xy_coord, 7)::DOUBLE PRECISION,
+                                            RIGHT(geo_xy_coord, 7)::DOUBLE PRECISION),2263),4326))::geometry(Point,4326) as geom
 INTO :NAME.:"VERSION"
 FROM tmp;
 

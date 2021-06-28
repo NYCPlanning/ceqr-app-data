@@ -28,18 +28,18 @@ INPUTS:
         y,
         address
     ),
-    doe_lcgms."2019_new"(
+    doe_lcgms.latest(
         location_code,
         location_name,
         managed_by_name,
         location_type_description,
         location_category_description,
         building_code,
-        building_name,
+        --building_name,
         address_line_1,
         borough_block_lot,
-        latitude,
-        longitude
+        --latitude,
+        --longitude
     )
 OUTPUTS:
 	TEMP tmp(
@@ -79,9 +79,9 @@ CREATE TEMP TABLE tmp AS(
             "hs_%" as hs_per,
             charter,
             org_level,
-            pc,
-            ic,
-            hc,
+            REPLACE(pc,',','') as pc,
+            REPLACE(ic,',','') as ic,
+            REPLACE(hc,',','') as hc,
             x,
             y,
             address,
@@ -117,11 +117,11 @@ CREATE TEMP TABLE tmp AS(
             location_type_description,
             location_category_description,
             building_code,
-            building_name,
+            --building_name,
             address_line_1,
             borough_block_lot,
-            latitude,
-            longitude,
+            --latitude,
+            --longitude,
             CASE
                 WHEN location_name ~* 'PORTABLE|MINI'
                     AND location_code||borough_block_lot IN
@@ -149,13 +149,13 @@ CREATE TEMP TABLE tmp AS(
                     OR location_category_description = 'Ungraded'
                 THEN 'location_category_description is NULL or Ungraded'
             END as excluded
-        FROM doe_lcgms."2019_new"  
+        FROM doe_lcgms.latest 
     )
     SELECT
         b.district, 
         b.subdistrict, 
         LEFT(a.borough_block_lot,1) as borocode,
-        a.building_name as bldg_name,
+        --a.building_name as bldg_name,
         b."bldg_excl." as excluded,
         a.building_code as bldg_id,
         a.location_code as org_id,
@@ -167,8 +167,7 @@ CREATE TEMP TABLE tmp AS(
         floor(b.ic::numeric) as ic,
         ceil(b.org_e::numeric*ROUND((REPLACE(b.ms_per,'%','')::numeric/100),5)) as ie,
         floor(b.hc::numeric) as hc,
-        ceil(b.org_e::numeric*ROUND((REPLACE(b.hs_per,'%','')::numeric/100),5)) as he,
-        ST_SetSRID(ST_MakePoint(REPLACE(a.longitude,'NULL', '0')::NUMERIC,REPLACE(a.latitude,'NULL', '0')::NUMERIC),4326) AS geom
+        ceil(b.org_e::numeric*ROUND((REPLACE(b.hs_per,'%','')::numeric/100),5)) as he
     FROM lcgms_filtered a
     LEFT JOIN bluebook_filtered b
     ON a.location_code=b.org_id
@@ -178,4 +177,4 @@ CREATE TEMP TABLE tmp AS(
 );
 
 \COPY (SELECT * FROM tmp WHERE district IS NULL AND subdistrict IS NULL) TO 'output/lcgms_not_in_bluebook.csv' DELIMITER ',' CSV HEADER;
-\COPY (SELECT * FROM tmp WHERE district IS NOT NULL AND subdistrict IS NOT NULL) TO PSTDOUT DELIMITER ',' CSV HEADER;
+\COPY (SELECT * FROM tmp WHERE district IS NOT NULL AND subdistrict IS NOT NULL) TO 'output/_ceqr_school_buildings.csv' DELIMITER ',' CSV HEADER;
