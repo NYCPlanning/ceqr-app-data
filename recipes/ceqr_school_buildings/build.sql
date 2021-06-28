@@ -176,5 +176,5 @@ CREATE TEMP TABLE tmp AS(
     AND b.excluded IS NULL
 );
 
-\COPY (SELECT * FROM tmp WHERE district IS NULL AND subdistrict IS NULL) TO 'output/lcgms_not_in_bluebook.csv' DELIMITER ',' CSV HEADER;
-\COPY (SELECT * FROM tmp WHERE district IS NOT NULL AND subdistrict IS NOT NULL) TO 'output/_ceqr_school_buildings.csv' DELIMITER ',' CSV HEADER;
+\COPY (SELECT * FROM tmp WHERE district IS NULL AND subdistrict IS NULL) TO 'output/lcgms_not_in_bluebook.csv' DELIMITER '|' CSV HEADER;
+\COPY (SELECT * FROM tmp WHERE district IS NOT NULL AND subdistrict IS NOT NULL) TO 'output/_ceqr_school_buildings.csv' DELIMITER '|' CSV HEADER;
