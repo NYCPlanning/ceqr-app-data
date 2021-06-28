@@ -167,8 +167,7 @@ CREATE TEMP TABLE tmp AS(
         floor(b.ic::numeric) as ic,
         ceil(b.org_e::numeric*ROUND((REPLACE(b.ms_per,'%','')::numeric/100),5)) as ie,
         floor(b.hc::numeric) as hc,
-        ceil(b.org_e::numeric*ROUND((REPLACE(b.hs_per,'%','')::numeric/100),5)) as he,
-        ST_SetSRID(ST_MakePoint(REPLACE(a.longitude,'NULL', '0')::NUMERIC,REPLACE(a.latitude,'NULL', '0')::NUMERIC),4326) AS geom
+        ceil(b.org_e::numeric*ROUND((REPLACE(b.hs_per,'%','')::numeric/100),5)) as he
     FROM lcgms_filtered a
     LEFT JOIN bluebook_filtered b
     ON a.location_code=b.org_id
