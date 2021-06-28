@@ -99,7 +99,7 @@ def _output(df):
         "geo_reason_code",
         "geo_message"
     ]
-    df[cols].to_csv('output/all_capacity_projects.csv')
+    df[cols].to_csv('output/ceqr_school_buildings.csv')
 
     # Remove special ed cases
     df_filtered = df[(df['district']!='75')&(df.org_level!='PK')&(df.org_level!='3K')]
