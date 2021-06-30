@@ -24,6 +24,6 @@ VERSION=$DATE
         
     )
     
-    # Upload $NAME $VERSION
-    # Upload $NAME latest
+    Upload $NAME $VERSION
+    Upload $NAME latest
 )
