@@ -98,7 +98,7 @@ CREATE TEMP TABLE tmp as (
                 WHEN REGEXP_REPLACE(c.name, '[^\w]+','','g') LIKE '%D75%' THEN NULL
             END as org_level,
             c.district,
-            c.capacity,
+            REPLACE(c.capacity,',','') as capacity,
             CASE
                 WHEN TRIM(borough) = 'M' THEN 'Manhattan'
                 WHEN TRIM(borough) = 'X' THEN 'Bronx'
