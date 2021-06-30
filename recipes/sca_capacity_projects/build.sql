@@ -55,7 +55,7 @@ CREATE TEMP TABLE tmp as (
             borough,
             address,
             COALESCE(number_of_seats, '0') as capacity,
-            REPLACE("opening_&_anticipated_opening",'SEPTEMBER ', '09-01-')::date as start_date,
+            TO_DATE("opening_&_anticipated_opening", 'month yyyy') as start_date,
             '15-19' as capital_plan
         FROM sca_capacity_projects_prev.latest
         UNION
@@ -65,7 +65,7 @@ CREATE TEMP TABLE tmp as (
             borough,
             location as address,
             COALESCE(capacity, '0') as capacity,
-            ('01-01-'||anticipated_opening)::date as start_date,
+            TO_DATE(anticipated_opening, 'month yyyy') as start_date,
             '20-24' as capital_plan
         FROM sca_capacity_projects_current.latest
         UNION
