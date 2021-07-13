@@ -4,7 +4,7 @@ on:
     types: [opened, edited]
 
 jobs:
-  push:
+  parsing:
     if: >- 
       contains(github.event.issue.title, '[build]') && 
       (
@@ -19,12 +19,10 @@ jobs:
       AWS_S3_ENDPOINT: ${{ secrets.AWS_S3_ENDPOINT }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    outputs: 
+      matrix: ${{ steps.parsing.outputs.matrix }}
     steps:
       - uses: actions/checkout@v2
-        
-      - name: Install dependencies
-        shell: bash
-        run: ./ceqr setup
       
       - name: Parse dataset names
         shell: python
@@ -38,18 +36,67 @@ jobs:
           end = splited.index("```")
           datasets=' '.join([i[2:] for i in splited[start:end]])
           os.system('echo "::set-output name=datasets::{0}"'.format(datasets))
+
+          datasets_json=json.dumps(json.dumps([i[2:] for i in splited[start:end]]))
+          os.system('''echo "::set-output name=matrix::{}"'''.format(datasets_json))
                   
       - name: Datasets to update...
-        run: echo "${{ steps.parsing.outputs.datasets }}"
-
-      - name: Run recipes
-        shell: bash
         run: |
-          for i in ${{ steps.parsing.outputs.datasets }}
-          do
-            ./ceqr run recipe $i
-          done
-          
+          echo "${{ steps.parsing.outputs.datasets }}"
+          echo ${{ steps.parsing.outputs.matrix }}
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [parsing]
+    env:
+      RECIPE_ENGINE: ${{ secrets.RECIPE_ENGINE }}
+      EDM_DATA: ${{ secrets.EDM_DATA }}
+      AWS_S3_ENDPOINT: ${{ secrets.AWS_S3_ENDPOINT }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    strategy:
+      matrix:
+        dataset: ${{ fromJSON(needs.parse.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Install dependencies
+        shell: bash
+        run: ./ceqr setup
+
+      - name: Random Sleep
+        run:  sleep $[ ( $RANDOM % 10 )  + 1 ]s
+
+      - name: Run recipe
+        shell: bash
+        run: ./ceqr run recipe ${{ matrix.dataset }}
+
+      - uses: actions/github-script@v3
+        name: Create Issue to Publish
+        with: 
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const title = `[publish] ${{ matrix.dataset }}`;
+            const body = `
+            ## There are new versions available of the following dataset(s)
+            ## Dataset(s)
+            \`\`\`yml
+            - ${{ matrix.dataset }}
+            \`\`\`
+            ## Next Steps: 
+            If you have manually checked above files and they seem to be ok, comment \`[publish]\` under this issue. 
+            This would allow github actions to move staging files to production. 
+            Feel free to close this issue once it's all complete. Thanks!
+            `;
+            github.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              assignees: ["nnxka"],
+              labels: ['publish']
+            });
+
       - name: Success Message
         if: success()
         uses:  peter-evans/close-issue@v1
@@ -61,4 +108,3 @@ jobs:
             ${{ steps.parsing.outputs.datasets }}
             
             *Updated by: @${{ github.actor }}* for more details, check https://github.com/NYCPlanning/ceqr-app-data/actions/runs/${{ github.run_id }}
-      
