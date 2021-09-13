@@ -49,9 +49,6 @@ def _import() -> pd.DataFrame:
     df = pd.read_csv(url, dtype=str, engine="c", index_col=False)
     df.to_csv("output/raw.csv", index=False)
 
-    # Open lookup between zip codes and boroughs
-    czb = pd.read_csv("../_data/city_zip_boro.csv", dtype=str, engine="c")
-
     # Check input columns and replace column names
     df.columns = [i.lower().replace(" ", "_") for i in df.columns]
     for col in cols:
