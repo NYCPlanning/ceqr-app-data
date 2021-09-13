@@ -9,12 +9,12 @@ VERSION=$DATE
     mkdir -p output
     
     docker run --rm\
+        -e EDM_DATA=$EDM_DATA\
+        -e CEQR_DATA=$CEQR_DATA\
         -v $(pwd)/../:/recipes\
         -e NAME=$NAME\
         -w /recipes/$NAME\
-        nycplanning/docker-geosupport:latest python3 build.py | 
-    psql $EDM_DATA -v NAME=$NAME -v VERSION=$VERSION -f create.sql
-
+        nycplanning/docker-geosupport:latest python3 build.py
     (
         cd output
         
@@ -34,5 +34,4 @@ VERSION=$DATE
     Upload $NAME $VERSION
     Upload $NAME latest
     rm -rf output
-    
 )

@@ -1,15 +1,23 @@
-import sys
 import os
-
-sys.path.insert(0, "..")
+import sys
 import pandas as pd
 import numpy as np
 import re
-from _helper.geo import get_hnum, get_sname, clean_address, find_intersection, find_stretch, geocode
 from multiprocessing import Pool, cpu_count
 
+#fmt: off
+sys.path.insert(0, "..")
+from _helper.geo import get_hnum, get_sname, clean_address, find_intersection, find_stretch, geocode
+from _helper.utils import psql_insert_copy
+from _helper import EDM_DATA, DATE
+#fmt: on
+
 CORR = pd.read_csv("../_data/air_corr.csv", dtype=str, engine="c")
-CORR_DICT = CORR.loc[CORR.datasource == "nysdec_state_facility_permits", :].to_dict('records')
+CORR_DICT = CORR.loc[CORR.datasource ==
+                     "nysdec_state_facility_permits", :].to_dict('records')
+
+NAME = 'nysdec_state_facility_permits'
+
 
 def _import() -> pd.DataFrame:
     """
@@ -41,37 +49,33 @@ def _import() -> pd.DataFrame:
     df = pd.read_csv(url, dtype=str, engine="c", index_col=False)
     df.to_csv("output/raw.csv", index=False)
 
-    # Open lookup between zip codes and boroughs
-    czb = pd.read_csv("../_data/city_zip_boro.csv", dtype=str, engine="c")
-
     # Check input columns and replace column names
     df.columns = [i.lower().replace(" ", "_") for i in df.columns]
     for col in cols:
         assert col in df.columns, f"Missing {col} in input data"
 
-    df = df.rename(columns={"expire_date": "expiration_date", "facility_zip": "zipcode", "georeference":"location"})
+    df['borough'] = df['facility_city'].apply(lambda x: x if x in [
+                                              'BROOKLYN', 'NEW YORK', 'STATEN ISLAND', 'BRONX'] else 'QUEENS')
 
-    # Get boro and limit to NYC
-    df = df.loc[df.zipcode.isin(czb.zipcode.tolist()), :]
-    df["borough"] = df.zipcode.apply(
-        lambda x: czb.loc[czb.zipcode == x, "boro"].tolist()[0]
-    )
+    df = df.rename(columns={"expire_date": "expiration_date",
+                   "facility_zip": "zipcode", "georeference": "location"})
 
     # Apply corrections to addresses
     for record in CORR_DICT:
         if record['location'] != record['correction'].upper():
-            df.loc[(df['facility_location']==record['location']) & (df['permit_id']==record['id']),'facility_location'] = record['correction'].upper()
+            df.loc[(df['facility_location'] == record['location']) & (
+                df['permit_id'] == record['id']), 'facility_location'] = record['correction'].upper()
 
     # Extract first location
     df["address"] = df["facility_location"].astype(str).apply(clean_address)
 
     # Parse stretches
     df[["streetname_1", "streetname_2", "streetname_3"]] = df.apply(
-            lambda row: pd.Series(find_stretch(row['address'])), axis=1)
-    
+        lambda row: pd.Series(find_stretch(row['address'])), axis=1)
+
     # Parse intersections
     df[["streetname_1", "streetname_2"]] = df.apply(
-            lambda row: pd.Series(find_intersection(row['address'])), axis=1)
+        lambda row: pd.Series(find_intersection(row['address'])), axis=1)
 
     # Parse house numbers
     df["hnum"] = (
@@ -85,6 +89,7 @@ def _import() -> pd.DataFrame:
     df["sname"] = df["address"].astype(str).apply(get_sname)
     df.to_csv('output/pre-geocoding.csv')
     return df
+
 
 def _geocode(df: pd.DataFrame) -> pd.DataFrame:
     """ 
@@ -116,13 +121,18 @@ def _geocode(df: pd.DataFrame) -> pd.DataFrame:
     )
     return df
 
+
 def correct_coords(df):
     for record in CORR_DICT:
         if record['location'] == record['correction'].upper():
-            df.loc[(df['facility_location']==record['location']) & (df['permit_id']==record['id']),'geo_latitude'] = float(record['latitude'])
-            df.loc[(df['facility_location']==record['location']) & (df['permit_id']==record['id']),'geo_longitude'] = float(record['longitude'])
-            df.loc[(df['facility_location']==record['location']) & (df['permit_id']==record['id']),'geo_function'] = 'Manual Correction'
+            df.loc[(df['facility_location'] == record['location']) & (
+                df['permit_id'] == record['id']), 'geo_latitude'] = float(record['latitude'])
+            df.loc[(df['facility_location'] == record['location']) & (
+                df['permit_id'] == record['id']), 'geo_longitude'] = float(record['longitude'])
+            df.loc[(df['facility_location'] == record['location']) & (
+                df['permit_id'] == record['id']), 'geo_function'] = 'Manual Correction'
     return df
+
 
 def _output(df):
     """ 
@@ -159,9 +169,14 @@ def _output(df):
         "geo_y_coord",
         "geo_function",
     ]
-    df = df.rename(columns={"hnum":"housenum", "sname":"streetname"})
-    df[cols].to_csv('output/raw.csv', index=False)
-    df[cols].to_csv(sys.stdout, index=False)
+    df = df.rename(columns={"hnum": "housenum", "sname": "streetname"})
+    df[cols].to_sql(
+        NAME,
+        con=EDM_DATA,
+        if_exists="replace",
+        index=False,
+        method=psql_insert_copy
+    )
 
 
 if __name__ == "__main__":
@@ -169,3 +184,31 @@ if __name__ == "__main__":
     df = _geocode(df)
     df = correct_coords(df)
     _output(df)
+    EDM_DATA.execute(f'''
+        DROP TABLE IF EXISTS {NAME}."{DATE}" CASCADE;
+        SELECT 
+            *,
+            (CASE WHEN geo_function = 'Intersection'
+                THEN ST_TRANSFORM(ST_SetSRID(ST_MakePoint(
+                    geo_x_coord::double precision,
+                    geo_y_coord::double precision),2263),4326)
+                ELSE ST_SetSRID(ST_MakePoint(geo_longitude,geo_latitude),4326)
+            END)::geometry(Point,4326) as geom
+        INTO {NAME}."{DATE}"
+        FROM nysdec_state_facility_permits;
+
+        DROP TABLE IF EXISTS {NAME}."geo_rejects";
+        SELECT *
+        INTO {NAME}."geo_rejects"
+        FROM {NAME}."{DATE}"
+        WHERE geom IS NULL;
+
+        DELETE FROM {NAME}."{DATE}" WHERE geom IS NULL;
+
+        DROP VIEW IF EXISTS {NAME}.latest;
+        CREATE VIEW {NAME}.latest AS (
+            SELECT '{DATE}' as v, * 
+            FROM {NAME}."{DATE}"
+        );
+        DROP TABLE IF EXISTS {NAME}; 
+    ''')

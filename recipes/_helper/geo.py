@@ -4,6 +4,7 @@ import re
 
 g = Geosupport()
 
+
 def get_hnum(address):
     """ 
     Parse address to extract house number using usaddress module
@@ -16,7 +17,8 @@ def get_hnum(address):
                     tagged by usaddress as a house number
     """
     address = "" if address is None else address
-    result = [k for (k, v) in usaddress.parse(address) if re.search("Address", v)]
+    result = [k for (k, v) in usaddress.parse(
+        address) if re.search("Address", v)]
     result = " ".join(result)
     fraction = re.findall("\d+[\/]\d+", address)
     if not bool(re.search("\d+[\/]\d+", result)) and len(fraction) != 0:
@@ -46,12 +48,15 @@ def get_sname(address):
     else:
         return result
 
+
 def get_borocode(c):
     """ 
     Translate county name to borocode
     """
-    borocode = {"NEW YORK": 1, "BRONX": 2, "KINGS": 3, "QUEENS": 4, "RICHMOND": 5}
+    borocode = {"NEW YORK": 1, "BRONX": 2,
+                "KINGS": 3, "QUEENS": 4, "RICHMOND": 5}
     return borocode.get(c.upper(), "")
+
 
 def clean_boro_name(b):
     """ 
@@ -65,10 +70,11 @@ def clean_boro_name(b):
         b = b.title()
     return b
 
+
 def clean_house(s):
     """ 
     Transform house number to a geosupport-readable format
-    
+
     Replace NULL with empty strings, remove special characters & excess white space,
     take first house number if there is additional information after a / or in parentheses
 
@@ -82,14 +88,15 @@ def clean_house(s):
     s = re.sub(r"\([^)]*\)", "", s)\
         .replace(' - ', '-')\
         .strip()\
-        .split("(",maxsplit=1)[0]\
-        .split("/",maxsplit=1)[0]
+        .split("(", maxsplit=1)[0]\
+        .split("/", maxsplit=1)[0]
     return s
+
 
 def clean_street(s):
     """ 
     Transform street name to a geosupport-readable format
-    
+
     Replace NULL with empty strings, remove apostrophes & special characters,
     take first street name if there is additional information after a / or in parentheses
 
@@ -102,20 +109,23 @@ def clean_street(s):
     s = '' if s is None else s
     s = "JFK INTERNATIONAL AIRPORT" if "JFK" in s else s
     s = re.sub(r"\([^)]*\)", "", s)\
-        .replace("'","")\
+        .replace("'", "")\
         .replace("VARIOUS", "")\
         .replace("LOCATIONS", "")\
-        .split("(",maxsplit=1)[0]\
-        .split("/",maxsplit=1)[0]
+        .split("(", maxsplit=1)[0]\
+        .split("/", maxsplit=1)[0]
     return s
+
 
 def clean_address(x):
     """ 
     Replace NULL with '' and take first string before | and @
     """
     x = "" if x is None else x
+    x = x.replace('�', '')
     return x.split('|', maxsplit=1)[0].split('@', maxsplit=1)[0]
-    
+
+
 def find_stretch(address):
     """ 
     Finds addresses that indicate a stretch and spilts into components
@@ -135,8 +145,9 @@ def find_stretch(address):
         street_3 = re.split("&| AND | and", bounding_streets)[1].strip()
         return street_1, street_2, street_3
     else:
-        return '','',''
-    
+        return '', '', ''
+
+
 def find_intersection(address):
     """ 
     Finds addresses that indicate an intersection and spilts into two streets
@@ -144,12 +155,12 @@ def find_intersection(address):
     if ("&" in address.upper()) or \
         (" AND " in address.upper()) or \
         (" CROSS " in address.upper()) or \
-        (" CRS " in address.upper()):
+            (" CRS " in address.upper()):
         street_1 = re.split("&| AND | and | CROSS | CRS ", address)[0].strip()
         street_2 = re.split("&| AND | and | CROSS | CRS ", address)[1].strip()
         return street_1, street_2
     else:
-        return '',''
+        return '', ''
 
 
 def geocode(inputs):
@@ -175,10 +186,10 @@ def geocode(inputs):
         if street_name_3 != "":
             # Stretch: Geocode with 3
             try:
-                geo = g['3'](street_name_1=street_name_1, 
-                            street_name_2=street_name_2, 
-                            street_name_3=street_name_3, 
-                            borough_code=borough)
+                geo = g['3'](street_name_1=street_name_1,
+                             street_name_2=street_name_2,
+                             street_name_3=street_name_3,
+                             borough_code=borough)
                 geo = geo_parser(geo)
                 geo.update(inputs)
                 geo.update(dict(geo_function="Stretch"))
@@ -192,9 +203,9 @@ def geocode(inputs):
         else:
             # Intersection: Geocode with 2
             try:
-                geo = g['2'](street_name_1=street_name_1, 
-                            street_name_2=street_name_2, 
-                            borough_code=borough)
+                geo = g['2'](street_name_1=street_name_1,
+                             street_name_2=street_name_2,
+                             borough_code=borough)
                 geo = geo_parser(geo)
                 geo.update(inputs)
                 geo.update(dict(geo_function='Intersection'))
@@ -208,7 +219,8 @@ def geocode(inputs):
     else:
         # House + street: Try 1B without TPAD
         try:
-            geo = g["1B"](street_name=sname, house_number=hnum, borough=borough)
+            geo = g["1B"](street_name=sname,
+                          house_number=hnum, borough=borough)
             geo = geo_parser(geo)
             geo.update(inputs)
             geo.update(dict(geo_function="1B"))
@@ -217,7 +229,7 @@ def geocode(inputs):
             # House + street: Try 1B with TPAD
             try:
                 geo = g["1B"](
-                street_name=sname, house_number=hnum, borough=borough, mode="tpad")
+                    street_name=sname, house_number=hnum, borough=borough, mode="tpad")
                 geo = geo_parser(geo)
                 geo.update(inputs)
                 geo.update(dict(geo_function="1B-tpad"))
@@ -228,6 +240,7 @@ def geocode(inputs):
                 geo.update(inputs)
                 geo.update(dict(geo_function="1B"))
                 return geo
+
 
 def geo_parser(geo):
     """ 
@@ -265,23 +278,25 @@ def geo_parser(geo):
     try:
         # Parse segment variables if they exist
         parsed_geo.update(dict(
-            geo_from_node = geo.get('From Node', ''),
-            geo_to_node = geo.get('To Node', ''),
-            geo_from_x_coord = g['2'](node=geo_from_node).get('SPATIAL COORDINATES', {}).get('X Coordinate', ''),
-            geo_from_y_coord = g['2'](node=geo_from_node).get('SPATIAL COORDINATES', {}).get('Y Coordinate', ''),
-            geo_to_x_coord = g['2'](node=geo_to_node).get('SPATIAL COORDINATES', {}).get('X Coordinate', ''),
-            geo_to_y_coord = g['2'](node=geo_to_node).get('SPATIAL COORDINATES', {}).get('Y Coordinate', ''))
+            geo_from_node=geo.get('From Node', ''),
+            geo_to_node=geo.get('To Node', ''),
+            geo_from_x_coord=g['2'](node=geo_from_node).get(
+                'SPATIAL COORDINATES', {}).get('X Coordinate', ''),
+            geo_from_y_coord=g['2'](node=geo_from_node).get(
+                'SPATIAL COORDINATES', {}).get('Y Coordinate', ''),
+            geo_to_x_coord=g['2'](node=geo_to_node).get(
+                'SPATIAL COORDINATES', {}).get('X Coordinate', ''),
+            geo_to_y_coord=g['2'](node=geo_to_node).get('SPATIAL COORDINATES', {}).get('Y Coordinate', ''))
         )
     except:
         # Keep dict "square" to translate DataFrame
         parsed_geo.update(dict(
-            geo_from_node = '',
-            geo_to_node = '',
-            geo_from_x_coord = '',
-            geo_from_y_coord = '',
-            geo_to_x_coord = '',
-            geo_to_y_coord = ''
+            geo_from_node='',
+            geo_to_node='',
+            geo_from_x_coord='',
+            geo_from_y_coord='',
+            geo_to_x_coord='',
+            geo_to_y_coord=''
         ))
 
     return parsed_geo
-    
