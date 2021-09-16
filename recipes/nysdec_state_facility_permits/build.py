@@ -13,6 +13,8 @@ from _helper import EDM_DATA, DATE
 #fmt: on
 
 CORR = pd.read_csv("../_data/air_corr.csv", dtype=str, engine="c")
+PERMITS = pd.read_csv(
+    "../_data/nysdec_state_facility_permits_permit_ids.csv", dtype=str)
 CORR_DICT = CORR.loc[CORR.datasource ==
                      "nysdec_state_facility_permits", :].to_dict('records')
 
@@ -112,7 +114,8 @@ def _geocode(df: pd.DataFrame) -> pd.DataFrame:
         it = pool.map(geocode, records, 10000)
 
     df = pd.DataFrame(it)
-    df = df[df["geo_grc"] != "71"]
+    # df = df[df["geo_grc"] != "71"]
+    df = df.loc[df.permit_id.isin(PERMITS.permit_id.unique()), :]
     df["geo_address"] = None
     df["geo_longitude"] = pd.to_numeric(df["geo_longitude"], errors="coerce")
     df["geo_latitude"] = pd.to_numeric(df["geo_latitude"], errors="coerce")
