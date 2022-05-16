@@ -10,7 +10,6 @@ VERSION=$DATE
     
     docker run --rm\
         -e EDM_DATA=$EDM_DATA\
-        -e CEQR_DATA=$CEQR_DATA\
         -v $(pwd)/../:/recipes\
         -e NAME=$NAME\
         -w /recipes/$NAME\

@@ -9,6 +9,7 @@ VERSION=$DATE
     mkdir -p output
 
     docker run --rm\
+        -e EDM_DATA=$EDM_DATA\
         -v $(pwd)/../:/recipes\
         -w /recipes/$NAME\
         --user $UID\
