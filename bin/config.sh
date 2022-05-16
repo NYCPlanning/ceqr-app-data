@@ -13,11 +13,6 @@ function set_env {
 }
 set_env .env
 
-echo "EDM DATA is:"
-echo $EDM_DATA
-echo "DO S3 endpoint is:"
-echo $AWS_S3_ENDPOINT
-
 function urlparse {
     proto="$(echo $1 | grep :// | sed -e's,^\(.*://\).*,\1,g')"
     url=$(echo $1 | sed -e s,$proto,,g)
