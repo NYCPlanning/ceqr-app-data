@@ -30,7 +30,7 @@ jobs:
           title: |
             [publish] dep_cats_permits
           token: ${{secrets.GITHUB_TOKEN}}
-          assignees: rtblair
+          assignees: jpiacentinidcp,ileoyu
           labels: publish
           body: |
             A fresh run of dep_cats_permits is complete! 🎉
