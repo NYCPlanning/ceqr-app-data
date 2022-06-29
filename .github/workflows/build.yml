@@ -37,11 +37,11 @@ jobs:
       - uses: JasonEtco/create-an-issue@v2.6.0
         name: Create Issue to Publish
         if: github.event.inputs.publish == 'yes'
+        env:
+          labels: publish
+          title: [publish] ${{ github.event.inputs.dataset }}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           filename: .github/ISSUE_TEMPLATE/build-issue.md
-          env:
-            labels: publish
-            title: [publish] ${{ github.event.inputs.dataset }}
-            GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           assignees: jpiacentinidcp,ileoyu
           labels: publish
