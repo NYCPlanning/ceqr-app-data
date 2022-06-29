@@ -38,10 +38,8 @@ jobs:
         name: Create Issue to Publish
         if: github.event.inputs.publish == 'yes'
         env:
-          labels: publish
-          title: title
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           filename: .github/ISSUE_TEMPLATE/build-issue.md
-          assignees: jpiacentinidcp,ileoyu
-          labels: publish
+          assignees: jpiacentinidcp, ileoyu
+
