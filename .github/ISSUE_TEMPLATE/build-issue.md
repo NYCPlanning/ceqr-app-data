@@ -1,7 +1,7 @@
 ---
 name: Publish Dataset
 about: Move dataset from staging environment to production environment
-title: [publish] {{ env.dataset }}
+title: publish {{ env.dataset }}
 labels: publish
 ---
 

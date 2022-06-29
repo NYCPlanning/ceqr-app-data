@@ -42,5 +42,7 @@ jobs:
           dataset: ${{ github.event.inputs.dataset }}
         with:
           filename: .github/ISSUE_TEMPLATE/build-issue.md
-          assignees: jpiacentinidcp, ileoyu
+          assignees: 
+            - jpiacentinidcp
+            - ileoyu
 
