@@ -41,9 +41,7 @@ jobs:
           title: |
             [publish] ${{ github.event.inputs.dataset }}
           token: ${{secrets.GITHUB_TOKEN}}
-          assignees: 
-            - jpiacentinidcp
-            - ileoyu
+          assignees: [jpiacentinidcp,ileoyu]
           labels: publish
           body: |
             A fresh run of ${{ github.event.inputs.dataset }} is complete! 🎉
