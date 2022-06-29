@@ -39,7 +39,7 @@ jobs:
         if: github.event.inputs.publish == 'yes'
         env:
           labels: publish
-          title: [publish] ${{ github.event.inputs.dataset }}
+          title: title
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           filename: .github/ISSUE_TEMPLATE/build-issue.md
