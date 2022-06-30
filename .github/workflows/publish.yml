@@ -18,7 +18,9 @@ jobs:
         contains(github.event.issue.title, '[publish]') && 
         contains(github.event.comment.body, '[publish]') && 
         (
+          github.event.comment.user.login == 'jpiacentinidcp'||
           github.event.comment.user.login == 'ileoyu'||
+          github.event.comment.user.login == 'omarortiz1'||
           github.event.comment.author_association == 'MEMBER'
         )
       ) ||
