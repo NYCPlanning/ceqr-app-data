@@ -1,6 +1,6 @@
 ---
 name: Monthly Run DEP CATS permits
-title: [publish] dep_cats_permits
+title: dep_cats_permits
 labels: publish
 assignees: jpiacentinidcp,ileoyu,OmarOrtiz1
 body: 'A fresh run of dep_cats_permits is complete! 🎉
