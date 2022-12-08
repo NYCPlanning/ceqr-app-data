@@ -1,8 +1,8 @@
 ---
 name: Monthly Run DEP CATS permits
-title: '[publish] dep_cats_permitsΩ'
-labels: 'publish'
-assignees: 'jpiacentinidcp,ileoyu,omarortiz1'
+title: [publish] dep_cats_permits
+labels: publish
+assignees: jpiacentinidcp,ileoyu,OmarOrtiz1
 body: 'A fresh run of dep_cats_permits is complete! 🎉
 ## Staging files output:
 - [ ] [version.txt](https://nyc3.digitaloceanspaces.com/edm-publishing/ceqr-app-data-staging/dep_cats_permits/latest/version.txt)
