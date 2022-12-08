@@ -2,7 +2,7 @@
 name: Monthly Run DEP CATS permits
 title: dep_cats_permits
 labels: publish
-assignees: jpiacentinidcp,ileoyu,OmarOrtiz1
+assignees: td928
 body: 'A fresh run of dep_cats_permits is complete! 🎉
 ## Staging files output:
 - [ ] [version.txt](https://nyc3.digitaloceanspaces.com/edm-publishing/ceqr-app-data-staging/dep_cats_permits/latest/version.txt)
