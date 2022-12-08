@@ -24,12 +24,13 @@ jobs:
         shell: bash
         run: ./ceqr run recipe dep_cats_permits
   
-      - uses: nashmaniac/create-issue-action@v1.1
+      - uses: JasonEtco/create-an-issue@v2
         name: Create Issue to Publish
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           title: |
             [publish] dep_cats_permits
-          token: ${{secrets.GITHUB_TOKEN}}
           assignees: jpiacentinidcp,ileoyu,omarortiz1
           labels: publish
           body: |
