@@ -1,7 +1,7 @@
 ---
 title: [publish] ${{ github.event.inputs.dataset }}
-assignees: ''
-labels: ''
+assignees: jpiacentinidcp, ileoyu, omarortiz1
+labels: publish
 ---
 
 A fresh run of ${{ github.event.inputs.dataset }} is complete! 🎉
