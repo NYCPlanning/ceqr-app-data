@@ -1,5 +1,5 @@
 ---
-title: 
+title: ${{ github.event.inputs.dataset }}
 assignees: jpiacentinidcp, ileoyu, omarortiz1
 labels: publish
 ---
