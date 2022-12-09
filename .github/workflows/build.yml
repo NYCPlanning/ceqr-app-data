@@ -41,7 +41,7 @@ jobs:
         if: github.event.inputs.publish == 'yes'
         with:
           filename: .github/ISSUE_TEMPLATE/build.md
-          title: |
-            [publish] ${{ github.event.inputs.dataset }}
+          title: ${{ github.event.inputs.dataset }}
           assignees: td928
           labels: publish
+          body: 
