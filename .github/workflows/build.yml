@@ -43,5 +43,5 @@ jobs:
           filename: .github/ISSUE_TEMPLATE/build.md
           title: |
             [publish] ${{ github.event.inputs.dataset }}
-          assignees: jpiacentinidcp, ileoyu, omarortiz1
+          assignees: td928
           labels: publish
