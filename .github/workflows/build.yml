@@ -41,4 +41,4 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           DATASET: ${{ github.event.inputs.dataset }}
         with:
-          filename: .github/ISSUE_TEMPLATE/build-ceqr.md
+          filename: .github/ISSUE_TEMPLATE/build-publish.md
