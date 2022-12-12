@@ -4,7 +4,7 @@ assignees: jpiacentinidcp, ileoyu, omarortiz1
 labels: publish
 ---
 
-A fresh run of ${{ github.event.inputs.dataset }} is complete! 🎉
+A fresh run of {{ env.DATASET }} is complete! 🎉
 
 ## Staging files output:
 - [ ] [version.txt](https://nyc3.digitaloceanspaces.com/edm-publishing/ceqr-app-data-staging/{{ env.DATASET }}/latest/version.txt)
