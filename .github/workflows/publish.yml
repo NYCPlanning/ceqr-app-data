@@ -21,6 +21,7 @@ jobs:
           github.event.comment.user.login == 'jpiacentinidcp'||
           github.event.comment.user.login == 'ileoyu'||
           github.event.comment.user.login == 'omarortiz1'||
+          github.event.comment.user.login == 'rtblair'||
           github.event.comment.author_association == 'MEMBER'
         )
       ) ||
