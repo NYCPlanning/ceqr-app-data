@@ -1,7 +1,6 @@
 ---
-title: publish {{ env.DATASET }}
-assignees: jpiacentinidcp, ileoyu, omarortiz1
-labels: publish
+title: [publish] {{ env.DATASET }}
+assignees: jpiacentinidcp, ileoyu, omarortiz1, rtblair
 ---
 
 A fresh run of {{ env.DATASET }} is complete! 🎉
