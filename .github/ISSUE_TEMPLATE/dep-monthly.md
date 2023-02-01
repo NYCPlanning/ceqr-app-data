@@ -1,8 +1,9 @@
 ---
-name: Monthly Run DEP CATS permits
+name: [publish] Monthly Run DEP CATS permits
 title: dep_cats_permits
 labels: publish
-assignees: jpiacentinidcp, ileoyu, OmarOrtiz1
+about: Approve a push of DEP CATS data to production.
+assignees: jpiacentinidcp, ileoyu, OmarOrtiz1, rtblair
 ---
 A fresh run of dep_cats_permits is complete! 🎉
 ## Staging files output:
