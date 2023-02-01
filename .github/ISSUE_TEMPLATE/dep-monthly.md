@@ -1,7 +1,6 @@
 ---
 name: Monthly Run DEP CATS permits
 title: dep_cats_permits
-labels: publish
 assignees: jpiacentinidcp, ileoyu, OmarOrtiz1
 ---
 A fresh run of dep_cats_permits is complete! 🎉
