@@ -34,11 +34,11 @@ jobs:
         shell: bash
         run: ./ceqr run recipe ${{ github.event.inputs.dataset }}
       
-      - uses: JasonEtco/create-an-issue@v2
-        name: Create Issue to Publish
-        if: github.event.inputs.publish == 'yes'
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          DATASET: ${{ github.event.inputs.dataset }}
-        with:
-          filename: .github/ISSUE_TEMPLATE/build-publish.md
+      # - uses: JasonEtco/create-an-issue@v2
+      #   name: Create Issue to Publish
+      #   if: github.event.inputs.publish == 'yes'
+      #   env:
+      #     GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      #     DATASET: ${{ github.event.inputs.dataset }}
+      #   with:
+      #     filename: .github/ISSUE_TEMPLATE/build-publish.md
