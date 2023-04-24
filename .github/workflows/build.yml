@@ -7,10 +7,10 @@ on:
         description: 'Dataset to build'
         required: true
         default: ''
-      publish:
-        description: 'Should this build get assigned to Labs for review? (yes/no)'
-        required: false
-        default: 'no'
+      # publish:
+      #   description: 'Should this build get assigned to Labs for review? (yes/no)'
+      #   required: false
+      #   default: 'no'
 
 jobs:
   build:
