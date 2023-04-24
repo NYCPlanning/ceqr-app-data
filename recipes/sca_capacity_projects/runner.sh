@@ -1,9 +1,9 @@
 #!/bin/bash
+set -e
 source $(pwd)/bin/config.sh
 BASEDIR=$(dirname $0)
 NAME=$(basename $BASEDIR)
 VERSION=$DATE
-set -e
 
 (
     cd $BASEDIR
