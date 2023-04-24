@@ -25,11 +25,11 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - uses: actions/checkout@v3
-      
-      - name: Setup python
-        uses: actions/setup-python@v4.5.0
-        with:
-          python-version: "3.11.1"
+
+      # - name: Setup python
+      #   uses: actions/setup-python@v4.5.0
+      #   with:
+      #     python-version: "3.11.1"
         
       - name: Install dependencies
         shell: bash
