@@ -9,8 +9,8 @@ VERSION=$DATE
     cd $BASEDIR
     mkdir -p output
 
-    psql -q $RECIPE_ENGINE -f build.sql | 
-    psql $EDM_DATA -v NAME=$NAME -v VERSION=$VERSION -f create.sql
+    psql $RECIPE_ENGINE --set ON_ERROR_STOP=1 --file build.sql | 
+    psql $EDM_DATA --set NAME=$NAME --set VERSION=$VERSION --set ON_ERROR_STOP=1 --file create.sql
 
     (
         cd output
