@@ -6,7 +6,6 @@ import pandas as pd
 import numpy as np
 import re
 from _helper.geo import get_hnum, get_sname, clean_address, find_intersection, find_stretch, geocode
-#from _helper.geo import get_hnum, get_sname, clean_house, clean_street, geocode
 from multiprocessing import Pool, cpu_count
 
 
@@ -21,7 +20,6 @@ def _import() -> pd.DataFrame:
                     from address
     """
     df = pd.read_csv('output/_sca_capacity_projects.csv')
-    print(f"Shape of _sca_capacity_projects: {df.shape}")
     if len(df) == 0:
         raise ValueError("_sca_capacity_projects has no rows!")
     
