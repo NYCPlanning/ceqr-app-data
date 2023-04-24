@@ -25,4 +25,4 @@ mc config host add spaces $AWS_S3_ENDPOINT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS
 register 'setup' '' 'install system dependencies' setup
 
 sudo apt install python3-pip
-pip3 install -r pandas numpy
+pip3 install -r requirements.txt
