@@ -15,7 +15,7 @@ VERSION=$DATE
     docker run --rm\
         -v $(pwd)/../:/recipes\
         -w /recipes/$NAME\
-        --env $EDM_DATA
+        # --env $EDM_DATA
         --user $UID\
         nycplanning/docker-geosupport:latest bash -c "python3 build.py" | 
     psql $EDM_DATA --set NAME=$NAME --set VERSION=$VERSION --set ON_ERROR_STOP=1 --file create.sql
