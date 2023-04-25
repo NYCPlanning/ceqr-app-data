@@ -11,7 +11,6 @@ VERSION=$DATE
 
     psql $RECIPE_ENGINE --set ON_ERROR_STOP=1 --file build.sql
 
-    # python3 build.py
     docker run --rm\
         -v $(pwd)/../:/recipes\
         -w /recipes/$NAME\
