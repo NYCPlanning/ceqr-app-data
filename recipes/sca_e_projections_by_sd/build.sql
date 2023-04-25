@@ -109,4 +109,4 @@ CREATE TEMP TABLE tmp as (
 
 );
 
-\COPY tmp TO PSTDOUT DELIMITER ',' CSV HEADER;
+\COPY tmp TO 'output/_sca_e_projections_by_sd.csv' DELIMITER ',' CSV HEADER;
