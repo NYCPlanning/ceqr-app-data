@@ -1,7 +1,7 @@
 CREATE TEMP TABLE tmp (
     year text,
     borough character varying,
-    hs text
+    hs bigint
 );
 
 \COPY tmp FROM 'output/_sca_e_projections_by_boro.csv' DELIMITER ',' CSV HEADER;
