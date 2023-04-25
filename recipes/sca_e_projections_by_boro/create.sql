@@ -1,7 +1,7 @@
 CREATE TEMP TABLE tmp (
     year text,
     borough character varying,
-    hs bigint
+    hs text
 );
 
 \COPY tmp FROM PSTDIN DELIMITER ',' CSV HEADER;
