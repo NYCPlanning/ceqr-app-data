@@ -49,4 +49,4 @@ CREATE TEMP TABLE tmp as (
     ORDER BY year, borough
 );
 
-\COPY tmp TO PSTDOUT DELIMITER '|' CSV HEADER;
+\COPY tmp TO 'output/_sca_e_projections_by_boro.csv' DELIMITER ',' CSV HEADER;
