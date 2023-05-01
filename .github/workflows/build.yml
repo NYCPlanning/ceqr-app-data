@@ -1,12 +1,12 @@
 name: Build CEQR Dataset
 run-name: "Build CEQR Dataset: ${{ inputs.dataset }}"
+
 on:
   workflow_dispatch:
     inputs:
       dataset:
         description: "Dataset to build"
         required: true
-        default: ""
 
 jobs:
   build:
