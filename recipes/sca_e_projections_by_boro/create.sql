@@ -4,7 +4,7 @@ CREATE TEMP TABLE tmp (
     hs bigint
 );
 
-\COPY tmp FROM PSTDIN DELIMITER ',' CSV HEADER;
+\COPY tmp FROM 'output/_sca_e_projections_by_boro.csv' DELIMITER ',' CSV HEADER;
 
 
 DROP TABLE IF EXISTS :NAME.:"VERSION" CASCADE;

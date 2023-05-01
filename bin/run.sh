@@ -1,4 +1,5 @@
 # #!/bin/bash
+set -e
 
 function run {
     bash $(pwd)/recipes/$1/runner.sh

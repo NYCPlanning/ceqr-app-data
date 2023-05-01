@@ -6,7 +6,7 @@ CREATE TEMP TABLE tmp (
     "is" numeric
 );
 
-\COPY tmp FROM PSTDIN DELIMITER ',' CSV HEADER;
+\COPY tmp FROM 'output/_sca_e_projections_by_sd.csv' DELIMITER ',' CSV HEADER;
 
 
 DROP TABLE IF EXISTS :NAME.:"VERSION" CASCADE;

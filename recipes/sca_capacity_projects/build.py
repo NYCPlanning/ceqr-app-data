@@ -6,7 +6,6 @@ import pandas as pd
 import numpy as np
 import re
 from _helper.geo import get_hnum, get_sname, clean_address, find_intersection, find_stretch, geocode
-#from _helper.geo import get_hnum, get_sname, clean_house, clean_street, geocode
 from multiprocessing import Pool, cpu_count
 
 
@@ -21,6 +20,8 @@ def _import() -> pd.DataFrame:
                     from address
     """
     df = pd.read_csv('output/_sca_capacity_projects.csv')
+    if len(df) == 0:
+        raise ValueError("_sca_capacity_projects has no rows!")
     
     # Import csv to replace invalid addresses with manual corrections
     cor_add_dict = pd.read_csv('../_data/sca_capacity_address_cor.csv', dtype=str, engine="c").to_dict('records')

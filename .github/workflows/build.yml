@@ -1,4 +1,5 @@
 name: Build CEQR Dataset
+run-name: "Build CEQR Dataset: ${{ inputs.dataset }}"
 on:
   push:
   workflow_dispatch:
@@ -7,10 +8,10 @@ on:
         description: 'Dataset to build'
         required: true
         default: ''
-      publish:
-        description: 'Should this build get assigned to Labs for review? (yes/no)'
-        required: false
-        default: 'no'
+      # publish:
+      #   description: 'Should this build get assigned to Labs for review? (yes/no)'
+      #   required: false
+      #   default: 'no'
 
 jobs:
   build:
@@ -24,7 +25,12 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
+      # - name: Setup python
+      #   uses: actions/setup-python@v4.5.0
+      #   with:
+      #     python-version: "3.11.1"
         
       - name: Install dependencies
         shell: bash
@@ -32,13 +38,13 @@ jobs:
 
       - name: Run recipe
         shell: bash
-        run: ./ceqr run recipe ${{ github.event.inputs.dataset }}
+        run: ./ceqr run recipe ${{ inputs.dataset }}
       
-      - uses: JasonEtco/create-an-issue@v2
-        name: Create Issue to Publish
-        if: github.event.inputs.publish == 'yes'
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          DATASET: ${{ github.event.inputs.dataset }}
-        with:
-          filename: .github/ISSUE_TEMPLATE/build-publish.md
+      # - uses: JasonEtco/create-an-issue@v2
+      #   name: Create Issue to Publish
+      #   if: github.event.inputs.publish == 'yes'
+      #   env:
+      #     GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      #     DATASET: ${{ github.event.inputs.dataset }}
+      #   with:
+      #     filename: .github/ISSUE_TEMPLATE/build-publish.md

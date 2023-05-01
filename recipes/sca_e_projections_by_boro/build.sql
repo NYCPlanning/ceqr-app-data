@@ -44,9 +44,9 @@ CREATE TEMP TABLE tmp as (
             REPLACE(grade_11, ',', '')::integer + 
             REPLACE(grade_12, ',', '')::integer
         ) as hs
-    FROM sca_e_projections."2020"
+    FROM sca_e_projections.latest
     WHERE district ~* 'HS'
     ORDER BY year, borough
 );
 
-\COPY tmp TO PSTDOUT DELIMITER ',' CSV HEADER;
+\COPY tmp TO 'output/_sca_e_projections_by_boro.csv' DELIMITER ',' CSV HEADER;

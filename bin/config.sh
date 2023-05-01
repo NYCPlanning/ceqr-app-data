@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 source $(pwd)/bin/cli.sh
 DATE=$(date "+%Y-%m-%d")
 
