@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 source $(pwd)/bin/config.sh
 BASEDIR=$(dirname $0)
 NAME=$(basename $BASEDIR)
@@ -18,7 +19,7 @@ VERSION=$DATE
         cd output
         
         # Export to CSV
-        psql $EDM_DATA -c "\COPY (
+        psql $EDM_DATA --set ON_ERROR_STOP=1 -c "\COPY (
             SELECT * FROM $NAME.\"$VERSION\"
         ) TO stdout DELIMITER ',' CSV HEADER;" > $NAME.csv
 
