@@ -6,7 +6,7 @@ labels: 'data update'
 assignees: ''
 ---
 
-A fresh run of {{ env.DATASET }} is complete! 🎉
+A fresh run of `{{ env.DATASET }}` is complete! 🎉
 
 This issue facilitates the review and publishing of data from the staging to the production location.
 
