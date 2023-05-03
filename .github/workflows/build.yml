@@ -6,7 +6,13 @@ on:
     inputs:
       dataset:
         description: "Dataset to build"
+        type: string
         required: true
+      publish:
+        description: "Should this build get assigned to Labs for review? (yes/no)"
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   build:
@@ -22,10 +28,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # - name: Setup python
-      #   uses: actions/setup-python@v4.5.0
-      #   with:
-      #     python-version: "3.11.1"
+      - name: Setup python
+        uses: actions/setup-python@v4.5.0
+        with:
+          python-version: "3.12"
 
       - name: Install dependencies
         shell: bash
@@ -34,3 +40,12 @@ jobs:
       - name: Run recipe
         shell: bash
         run: ./ceqr run recipe ${{ inputs.dataset }}
+
+      - uses: JasonEtco/create-an-issue@v2
+        name: Create issue to review data to publish
+        if: inputs.run_export == true
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          DATASET: ${{ github.event.inputs.dataset }}
+        with:
+          filename: .github/ISSUE_TEMPLATE/build-publish.md
