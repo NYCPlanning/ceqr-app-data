@@ -3,7 +3,11 @@ name: Publish Dataset
 about: Runs recipe to build specified recipe
 title: '[publish] {{ env.DATASET }}'
 labels: 'data update'
-assignees: ''
+assignees:
+    - ileoyu
+    - OmarOrtiz1
+    - jpiacentinidcp
+    - rtblair
 ---
 
 A fresh run of `{{ env.DATASET }}` is complete! 🎉
