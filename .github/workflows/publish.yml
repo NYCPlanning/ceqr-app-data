@@ -1,4 +1,4 @@
-name: Publish CEQR Recipe
+name: Publish CEQR Data
 on:
   issue_comment:
     types: [created]
@@ -17,10 +17,6 @@ jobs:
         github.event_name == 'issue_comment' &&
         contains(github.event.issue.title, '[publish]') && 
         contains(github.event.comment.body, '[publish]') && (
-          github.event.comment.user.login == 'jpiacentinidcp'||
-          github.event.comment.user.login == 'ileoyu'||
-          github.event.comment.user.login == 'omarortiz1'||
-          github.event.comment.user.login == 'rtblair'||
           github.event.comment.author_association == 'MEMBER'
         )
       ) ||
@@ -52,12 +48,12 @@ jobs:
           title = title.replace('[publish] ', '').replace('\n', '')
           os.system('echo "::set-output name=dataset::{0}"'.format(title))
           
-      - name: Run recipe
+      - name: Run publish (via issue comment)
         if: github.event_name == 'issue_comment'
         shell: bash
         run: ./ceqr publish recipe ${{ steps.parsing.outputs.dataset }}
       
-      - name: Run Recipe
+      - name: Run publish (via manual action run)
         if: github.event_name == 'workflow_dispatch'
         shell: bash
         run: ./ceqr publish recipe ${{ github.event.inputs.dataset }}
