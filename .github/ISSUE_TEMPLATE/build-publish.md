@@ -1,7 +1,7 @@
 ---
 name: Publish Dataset
 about: Runs recipe to build specified recipe
-title: [publish] {{ env.DATASET }}
+title: '[publish] {{ env.DATASET }}'
 labels: 'data update'
 assignees: ''
 ---
