@@ -8,6 +8,8 @@ import re
 from _helper.geo import get_hnum, get_sname, clean_address, find_intersection, find_stretch, geocode
 from multiprocessing import Pool, cpu_count
 
+URL_NYSDEC_TITLE_V_PERMITS = "https://data.ny.gov/resource/4n3a-en4b.csv"
+
 CORR = pd.read_csv("../_data/air_corr.csv", dtype=str, engine="c")
 CORR_DICT = CORR.loc[CORR.datasource == "nysdec_title_v_facility_permits", :].to_dict('records')
 
@@ -24,7 +26,7 @@ def _import() -> pd.DataFrame:
         expiration_date, location, address, borough, 
         hnum, sname, streetname_1, streetname_2
     """
-    url = "https://data.ny.gov/api/views/4n3a-en4b/rows.csv"
+    # url = "https://data.ny.gov/api/views/4n3a-en4b/rows.csv"
     cols = [
         "facility_name",
         "permit_id",
@@ -37,7 +39,7 @@ def _import() -> pd.DataFrame:
         "expiration_date",
         "georeference",
     ]
-    df = pd.read_csv(url, dtype=str, engine="c", index_col=False)
+    df = pd.read_csv(URL_NYSDEC_TITLE_V_PERMITS, dtype=str, engine="c", index_col=False)
     df.to_csv("output/raw.csv", index=False)
 
     czb = pd.read_csv("../_data/city_zip_boro.csv", dtype=str, engine="c")
