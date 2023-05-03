@@ -9,8 +9,10 @@ from multiprocessing import Pool, cpu_count
 sys.path.insert(0, "..")
 from _helper.geo import get_hnum, get_sname, clean_address, find_intersection, find_stretch, geocode
 from _helper.utils import psql_insert_copy
-from _helper import EDM_DATA, DATE
+from _helper import create_edm_date_engine, execute_sql_query, DATE
 #fmt: on
+
+URL_NYSDEC_STATE_FACILITY_PERMITS = "https://data.ny.gov/resource/2wgt-bc53.csv"
 
 CORR = pd.read_csv("../_data/air_corr.csv", dtype=str, engine="c")
 CORR_DICT = CORR.loc[CORR.datasource ==
@@ -33,7 +35,7 @@ def _import() -> pd.DataFrame:
         address, borough, hnum, sname, 
         streetname_1, streetname_2
     """
-    url = "https://data.ny.gov/api/views/2wgt-bc53/rows.csv"
+    # url = "https://data.ny.gov/api/views/2wgt-bc53/rows.csv"
     cols = [
         "facility_name",
         "permit_id",
@@ -46,7 +48,7 @@ def _import() -> pd.DataFrame:
         "expire_date",
         "georeference",
     ]
-    df = pd.read_csv(url, dtype=str, engine="c", index_col=False)
+    df = pd.read_csv(URL_NYSDEC_STATE_FACILITY_PERMITS, dtype=str, engine="c", index_col=False)
     df.to_csv("output/raw.csv", index=False)
 
     # Check input columns and replace column names
@@ -172,7 +174,7 @@ def _output(df):
     df = df.rename(columns={"hnum": "housenum", "sname": "streetname"})
     df[cols].to_sql(
         NAME,
-        con=EDM_DATA,
+        con=create_edm_date_engine(),
         if_exists="replace",
         index=False,
         method=psql_insert_copy
@@ -180,35 +182,38 @@ def _output(df):
 
 
 if __name__ == "__main__":
+    print(f"Using {NAME=} and {DATE=}")
     df = _import()
     df = _geocode(df)
     df = correct_coords(df)
     _output(df)
-    EDM_DATA.execute(f'''
-        DROP TABLE IF EXISTS {NAME}."{DATE}" CASCADE;
-        SELECT 
-            *,
-            (CASE WHEN geo_function = 'Intersection'
-                THEN ST_TRANSFORM(ST_SetSRID(ST_MakePoint(
-                    geo_x_coord::double precision,
-                    geo_y_coord::double precision),2263),4326)
-                ELSE ST_SetSRID(ST_MakePoint(geo_longitude,geo_latitude),4326)
-            END)::geometry(Point,4326) as geom
-        INTO {NAME}."{DATE}"
-        FROM nysdec_state_facility_permits;
+    execute_sql_query(f'''
+            DROP TABLE IF EXISTS {NAME}."{DATE}" CASCADE;
+            SELECT 
+                *,
+                (CASE WHEN geo_function = 'Intersection'
+                    THEN ST_TRANSFORM(ST_SetSRID(ST_MakePoint(
+                        geo_x_coord::double precision,
+                        geo_y_coord::double precision),2263),4326)
+                    ELSE ST_SetSRID(ST_MakePoint(geo_longitude,geo_latitude),4326)
+                END)::geometry(Point,4326) as geom
+            INTO {NAME}."{DATE}"
+            FROM nysdec_state_facility_permits;
 
-        DROP TABLE IF EXISTS {NAME}."geo_rejects";
-        SELECT *
-        INTO {NAME}."geo_rejects"
-        FROM {NAME}."{DATE}"
-        WHERE geom IS NULL;
-
-        DELETE FROM {NAME}."{DATE}" WHERE geom IS NULL;
-
-        DROP VIEW IF EXISTS {NAME}.latest;
-        CREATE VIEW {NAME}.latest AS (
-            SELECT '{DATE}' as v, * 
+            DROP TABLE IF EXISTS {NAME}."geo_rejects";
+            SELECT *
+            INTO {NAME}."geo_rejects"
             FROM {NAME}."{DATE}"
-        );
-        DROP TABLE IF EXISTS {NAME}; 
-    ''')
+            WHERE geom IS NULL;
+
+            DELETE FROM {NAME}."{DATE}" WHERE geom IS NULL;
+
+            DROP VIEW IF EXISTS {NAME}.latest;
+            CREATE VIEW {NAME}.latest AS (
+                SELECT '{DATE}' as v, * 
+                FROM {NAME}."{DATE}"
+            );
+            DROP TABLE IF EXISTS {NAME}; 
+        '''
+    )
+    print("Done with build.py")
