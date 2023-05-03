@@ -2,6 +2,9 @@ from geosupport import Geosupport, GeosupportError
 import usaddress
 import re
 
+# A GRC value other than ‘00’ or ‘01’ signifies unsuccessful completion, or rejection, caused by either a system error or a user error.
+GEOSUPPORT_RETURN_CODE_REJECTION = "71"
+
 g = Geosupport()
 
 

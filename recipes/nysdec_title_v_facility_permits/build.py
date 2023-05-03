@@ -5,7 +5,7 @@ sys.path.insert(0, "..")
 import pandas as pd
 import numpy as np
 import re
-from _helper.geo import get_hnum, get_sname, clean_address, find_intersection, find_stretch, geocode
+from _helper.geo import get_hnum, get_sname, clean_address, find_intersection, find_stretch, geocode, GEOSUPPORT_RETURN_CODE_REJECTION
 from multiprocessing import Pool, cpu_count
 
 URL_NYSDEC_TITLE_V_PERMITS = "https://data.ny.gov/resource/4n3a-en4b.csv"
@@ -103,7 +103,7 @@ def _geocode(df: pd.DataFrame) -> pd.DataFrame:
         it = pool.map(geocode, records, 10000)
 
     df = pd.DataFrame(it)
-    df = df[df["geo_grc"] != "71"]
+    df = df[df["geo_grc"] != GEOSUPPORT_RETURN_CODE_REJECTION]
     df["geo_address"] = None
     df["geo_longitude"] = pd.to_numeric(df["geo_longitude"], errors="coerce")
     df["geo_latitude"] = pd.to_numeric(df["geo_latitude"], errors="coerce")
