@@ -7,7 +7,7 @@ from multiprocessing import Pool, cpu_count
 
 #fmt: off
 sys.path.insert(0, "..")
-from _helper.geo import get_hnum, get_sname, clean_address, find_intersection, find_stretch, geocode
+from _helper.geo import get_hnum, get_sname, clean_address, find_intersection, find_stretch, geocode, GEOSUPPORT_RETURN_CODE_REJECTION
 from _helper.utils import psql_insert_copy
 from _helper import create_edm_date_engine, execute_sql_query, DATE
 #fmt: on
@@ -114,7 +114,7 @@ def _geocode(df: pd.DataFrame) -> pd.DataFrame:
         it = pool.map(geocode, records, 10000)
 
     df = pd.DataFrame(it)
-    df = df[df["geo_grc"] != "71"]
+    # df = df[df["geo_grc"] != GEOSUPPORT_RETURN_CODE_REJECTION]
     df["geo_address"] = None
     df["geo_longitude"] = pd.to_numeric(df["geo_longitude"], errors="coerce")
     df["geo_latitude"] = pd.to_numeric(df["geo_latitude"], errors="coerce")
@@ -160,6 +160,8 @@ def _output(df):
         "issue_date",
         "expiration_date",
         "location",
+        "geo_grc",
+        "geo_message",
         "geo_housenum",
         "geo_streetname",
         "geo_address",
