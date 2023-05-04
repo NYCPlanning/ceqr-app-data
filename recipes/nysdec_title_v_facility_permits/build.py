@@ -63,11 +63,11 @@ def _import() -> pd.DataFrame:
 
     # Parse stretches
     df[["streetname_1", "streetname_2","streetname_3"]] = df.apply(
-            lambda row: pd.Series(find_stretch(row['address'])), axis=1)
+        lambda row: pd.Series(find_stretch(row['address'])), axis=1)
     
     # Parse intersections
     df[["streetname_1", "streetname_2"]] = df.apply(
-            lambda row: pd.Series(find_intersection(row['address'])), axis=1)
+        lambda row: pd.Series(find_intersection(row['address'])), axis=1)
 
     # Parse house numbers
     df["hnum"] = (
@@ -145,6 +145,8 @@ def _output(df):
         "issue_date",
         "expiration_date",
         "location",
+        "geo_grc",
+        "geo_message",
         "geo_housenum",
         "geo_streetname",
         "geo_address",

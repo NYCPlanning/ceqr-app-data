@@ -23,6 +23,9 @@ VERSION=$DATE
         psql $EDM_DATA --set ON_ERROR_STOP=1 -c "\COPY (
             SELECT * FROM $NAME.\"$VERSION\"
         ) TO stdout DELIMITER ',' CSV HEADER;" > $NAME.csv
+        psql $EDM_DATA --set ON_ERROR_STOP=1 -c "\COPY (
+            SELECT * FROM $NAME.geo_rejects
+        ) TO stdout DELIMITER ',' CSV HEADER;" > geo_rejects.csv
 
         # Export to ShapeFile
         SHP_export $EDM_DATA $NAME.$VERSION POINT $NAME

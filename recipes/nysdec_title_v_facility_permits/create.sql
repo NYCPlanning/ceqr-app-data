@@ -56,6 +56,8 @@ CREATE TEMP TABLE nysdec_title_v_facility_permits (
     issue_date date,
     expiration_date date,
     location text,
+    geo_grc text,
+    geo_message text,
     geo_housenum text,
     geo_streetname text,
     geo_address text,
