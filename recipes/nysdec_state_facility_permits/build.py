@@ -56,11 +56,19 @@ def _import() -> pd.DataFrame:
     for col in cols:
         assert col in df.columns, f"Missing {col} in input data"
 
-    df['borough'] = df['facility_city'].apply(lambda x: x if x in [
-                                              'BROOKLYN', 'NEW YORK', 'STATEN ISLAND', 'BRONX'] else 'QUEENS')
-
     df = df.rename(columns={"expire_date": "expiration_date",
                    "facility_zip": "zipcode", "georeference": "location"})
+    
+    # Get borough and limit to NYC via city
+    city_borough = pd.read_csv("../_data/city_boro.csv", dtype=str, engine="c")
+    df = pd.merge(
+        df,
+        city_borough,
+        how="left",
+        left_on="facility_city",
+        right_on="city",
+    )
+    df = df.rename(columns={"boro": "borough"}, errors="raise")
 
     # Apply corrections to addresses
     for record in CORR_DICT:

@@ -42,23 +42,29 @@ def _import() -> pd.DataFrame:
     df = pd.read_csv(URL_NYSDEC_TITLE_V_PERMITS, dtype=str, engine="c", index_col=False)
     df.to_csv("output/raw.csv", index=False)
 
-    czb = pd.read_csv("../_data/city_zip_boro.csv", dtype=str, engine="c")
-
     df.columns = [i.lower().replace(" ", "_") for i in df.columns]
     for col in cols:
         assert col in df.columns, f"Missing {col} in input data"
     df = df.rename(columns={"facility_zip": "zipcode", "georeference":"location"})
 
-    # Get boro and limit to NYC
-    df = df.loc[df.zipcode.isin(czb.zipcode.tolist()), :]
-    df["borough"] = df.zipcode.apply(
-        lambda x: czb.loc[czb.zipcode == x, "boro"].tolist()[0]
+    # Get borough and limit to NYC via city
+    city_borough = pd.read_csv("../_data/city_boro.csv", dtype=str, engine="c")
+    df = pd.merge(
+        df,
+        city_borough,
+        how="left",
+        left_on="facility_city",
+        right_on="city",
     )
+    df = df.rename(columns={"boro": "borough"}, errors="raise")
 
     # Apply corrections to addresses
     for record in CORR_DICT:
         if record['location'] != record['correction'].upper():
-            df.loc[(df['facility_location']==record['location']) & (df['permit_id']==record['id']),'facility_location'] = record['correction'].upper()
+            df.loc[(df['facility_location']==record['location']) & (
+                df['permit_id']==record['id']),'facility_location'] = record['correction'].upper()
+    
+    # Extract first location
     df["address"] = df["facility_location"].astype(str).apply(clean_address)
 
     # Parse stretches
