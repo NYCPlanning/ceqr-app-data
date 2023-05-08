@@ -128,4 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Data we don't want in github
+recipes/_data/*/
 output/

@@ -7,10 +7,12 @@ from multiprocessing import Pool, cpu_count
 
 #fmt: off
 sys.path.insert(0, "..")
-from _helper.geo import get_hnum, get_sname, clean_address, find_intersection, find_stretch, geocode
+from _helper.geo import get_hnum, get_sname, clean_address, find_intersection, find_stretch, geocode, GEOSUPPORT_RETURN_CODE_REJECTION
 from _helper.utils import psql_insert_copy
-from _helper import EDM_DATA, DATE
+from _helper import EDM_DATA_SQL_ENGINE, DATE, execute_sql_query
 #fmt: on
+
+URL_NYSDEC_STATE_FACILITY_PERMITS = "https://data.ny.gov/resource/2wgt-bc53.csv"
 
 CORR = pd.read_csv("../_data/air_corr.csv", dtype=str, engine="c")
 CORR_DICT = CORR.loc[CORR.datasource ==
@@ -33,7 +35,6 @@ def _import() -> pd.DataFrame:
         address, borough, hnum, sname, 
         streetname_1, streetname_2
     """
-    url = "https://data.ny.gov/api/views/2wgt-bc53/rows.csv"
     cols = [
         "facility_name",
         "permit_id",
@@ -46,7 +47,7 @@ def _import() -> pd.DataFrame:
         "expire_date",
         "georeference",
     ]
-    df = pd.read_csv(url, dtype=str, engine="c", index_col=False)
+    df = pd.read_csv(URL_NYSDEC_STATE_FACILITY_PERMITS, dtype=str, engine="c", index_col=False)
     df.to_csv("output/raw.csv", index=False)
 
     # Check input columns and replace column names
@@ -54,11 +55,19 @@ def _import() -> pd.DataFrame:
     for col in cols:
         assert col in df.columns, f"Missing {col} in input data"
 
-    df['borough'] = df['facility_city'].apply(lambda x: x if x in [
-                                              'BROOKLYN', 'NEW YORK', 'STATEN ISLAND', 'BRONX'] else 'QUEENS')
-
     df = df.rename(columns={"expire_date": "expiration_date",
                    "facility_zip": "zipcode", "georeference": "location"})
+    
+    # Get borough and limit to NYC via city
+    city_borough = pd.read_csv("../_data/city_boro.csv", dtype=str, engine="c")
+    df = pd.merge(
+        df,
+        city_borough,
+        how="left",
+        left_on="facility_city",
+        right_on="city",
+    )
+    df = df.rename(columns={"boro": "borough"}, errors="raise")
 
     # Apply corrections to addresses
     for record in CORR_DICT:
@@ -112,7 +121,7 @@ def _geocode(df: pd.DataFrame) -> pd.DataFrame:
         it = pool.map(geocode, records, 10000)
 
     df = pd.DataFrame(it)
-    df = df[df["geo_grc"] != "71"]
+    df = df[df["geo_grc"] != GEOSUPPORT_RETURN_CODE_REJECTION]
     df["geo_address"] = None
     df["geo_longitude"] = pd.to_numeric(df["geo_longitude"], errors="coerce")
     df["geo_latitude"] = pd.to_numeric(df["geo_latitude"], errors="coerce")
@@ -158,6 +167,8 @@ def _output(df):
         "issue_date",
         "expiration_date",
         "location",
+        "geo_grc",
+        "geo_message",
         "geo_housenum",
         "geo_streetname",
         "geo_address",
@@ -172,7 +183,7 @@ def _output(df):
     df = df.rename(columns={"hnum": "housenum", "sname": "streetname"})
     df[cols].to_sql(
         NAME,
-        con=EDM_DATA,
+        con=EDM_DATA_SQL_ENGINE,
         if_exists="replace",
         index=False,
         method=psql_insert_copy
@@ -180,35 +191,38 @@ def _output(df):
 
 
 if __name__ == "__main__":
+    print(f"Using {NAME=} and {DATE=}")
     df = _import()
     df = _geocode(df)
     df = correct_coords(df)
     _output(df)
-    EDM_DATA.execute(f'''
-        DROP TABLE IF EXISTS {NAME}."{DATE}" CASCADE;
-        SELECT 
-            *,
-            (CASE WHEN geo_function = 'Intersection'
-                THEN ST_TRANSFORM(ST_SetSRID(ST_MakePoint(
-                    geo_x_coord::double precision,
-                    geo_y_coord::double precision),2263),4326)
-                ELSE ST_SetSRID(ST_MakePoint(geo_longitude,geo_latitude),4326)
-            END)::geometry(Point,4326) as geom
-        INTO {NAME}."{DATE}"
-        FROM nysdec_state_facility_permits;
+    execute_sql_query(f'''
+            DROP TABLE IF EXISTS {NAME}."{DATE}" CASCADE;
+            SELECT 
+                *,
+                (CASE WHEN geo_function = 'Intersection'
+                    THEN ST_TRANSFORM(ST_SetSRID(ST_MakePoint(
+                        geo_x_coord::double precision,
+                        geo_y_coord::double precision),2263),4326)
+                    ELSE ST_SetSRID(ST_MakePoint(geo_longitude,geo_latitude),4326)
+                END)::geometry(Point,4326) as geom
+            INTO {NAME}."{DATE}"
+            FROM nysdec_state_facility_permits;
 
-        DROP TABLE IF EXISTS {NAME}."geo_rejects";
-        SELECT *
-        INTO {NAME}."geo_rejects"
-        FROM {NAME}."{DATE}"
-        WHERE geom IS NULL;
-
-        DELETE FROM {NAME}."{DATE}" WHERE geom IS NULL;
-
-        DROP VIEW IF EXISTS {NAME}.latest;
-        CREATE VIEW {NAME}.latest AS (
-            SELECT '{DATE}' as v, * 
+            DROP TABLE IF EXISTS {NAME}."geo_rejects";
+            SELECT *
+            INTO {NAME}."geo_rejects"
             FROM {NAME}."{DATE}"
-        );
-        DROP TABLE IF EXISTS {NAME}; 
-    ''')
+            WHERE geom IS NULL;
+
+            DELETE FROM {NAME}."{DATE}" WHERE geom IS NULL;
+
+            DROP VIEW IF EXISTS {NAME}.latest;
+            CREATE VIEW {NAME}.latest AS (
+                SELECT '{DATE}' as v, * 
+                FROM {NAME}."{DATE}"
+            );
+            DROP TABLE IF EXISTS {NAME}; 
+        '''
+    )
+    print("Done with build.py")
