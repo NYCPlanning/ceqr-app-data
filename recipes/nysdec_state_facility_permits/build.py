@@ -9,7 +9,7 @@ from multiprocessing import Pool, cpu_count
 sys.path.insert(0, "..")
 from _helper.geo import get_hnum, get_sname, clean_address, find_intersection, find_stretch, geocode, GEOSUPPORT_RETURN_CODE_REJECTION
 from _helper.utils import psql_insert_copy
-from _helper import create_edm_date_engine, execute_sql_query, DATE
+from _helper import EDM_DATA_SQL_ENGINE, DATE, execute_sql_query
 #fmt: on
 
 URL_NYSDEC_STATE_FACILITY_PERMITS = "https://data.ny.gov/resource/2wgt-bc53.csv"
@@ -183,7 +183,7 @@ def _output(df):
     df = df.rename(columns={"hnum": "housenum", "sname": "streetname"})
     df[cols].to_sql(
         NAME,
-        con=create_edm_date_engine(),
+        con=EDM_DATA_SQL_ENGINE,
         if_exists="replace",
         index=False,
         method=psql_insert_copy
