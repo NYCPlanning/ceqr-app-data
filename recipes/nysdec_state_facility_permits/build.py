@@ -35,7 +35,6 @@ def _import() -> pd.DataFrame:
         address, borough, hnum, sname, 
         streetname_1, streetname_2
     """
-    # url = "https://data.ny.gov/api/views/2wgt-bc53/rows.csv"
     cols = [
         "facility_name",
         "permit_id",
@@ -122,7 +121,7 @@ def _geocode(df: pd.DataFrame) -> pd.DataFrame:
         it = pool.map(geocode, records, 10000)
 
     df = pd.DataFrame(it)
-    # df = df[df["geo_grc"] != GEOSUPPORT_RETURN_CODE_REJECTION]
+    df = df[df["geo_grc"] != GEOSUPPORT_RETURN_CODE_REJECTION]
     df["geo_address"] = None
     df["geo_longitude"] = pd.to_numeric(df["geo_longitude"], errors="coerce")
     df["geo_latitude"] = pd.to_numeric(df["geo_latitude"], errors="coerce")

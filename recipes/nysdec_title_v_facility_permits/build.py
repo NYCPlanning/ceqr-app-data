@@ -26,7 +26,6 @@ def _import() -> pd.DataFrame:
         expiration_date, location, address, borough, 
         hnum, sname, streetname_1, streetname_2
     """
-    # url = "https://data.ny.gov/api/views/4n3a-en4b/rows.csv"
     cols = [
         "facility_name",
         "permit_id",
