@@ -1,13 +1,15 @@
 ---
 name: Monthly Run DEP CATS permits
-title: [publish] dep_cats_permits
-assignees:
-  - jpiacentinidcp
-  - ileoyu
-  - OmarOrtiz1
-  - rtblair
 about: Approve a push of DEP CATS data to production.
+title: "[publish] dep_cats_permits"
+labels: 'data update'
+assignees:
+    - ileoyu
+    - OmarOrtiz1
+    - jpiacentinidcp
+    - rtblair
 ---
+
 A fresh run of dep_cats_permits is complete! 🎉
 ## Staging files output:
 - [ ] [version.txt](https://nyc3.digitaloceanspaces.com/edm-publishing/ceqr-app-data-staging/dep_cats_permits/latest/version.txt)
