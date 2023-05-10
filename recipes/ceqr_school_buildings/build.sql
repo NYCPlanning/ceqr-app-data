@@ -200,6 +200,7 @@ CREATE TEMP TABLE tmp AS (
         a.location_name AS name,
         a.primary_address AS address,
         LEFT(a.borough_block_lot, 1) AS borocode,
+        b.org_e,
         FLOOR(b.pc::numeric) AS pc,
         CEIL(
             b.org_e::numeric * ROUND((b.ps_per::numeric), 5)
