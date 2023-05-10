@@ -1,7 +1,7 @@
 ---
 name: Monthly Run DEP CATS permits
 title: [publish] dep_cats_permits
-assignees: 
+assignees:
   - jpiacentinidcp
   - ileoyu
   - OmarOrtiz1
