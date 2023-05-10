@@ -80,10 +80,14 @@ def _output(df):
         "org_level",
         "name",
         "address",
+        "org_e",
         "pc",
         "pe",
+        "pe_seats_avail",
         "ic",
         "ie",
+        "ie_seats_avail",
+        "psis_seats",
         "hc",
         "he",
         "geo_xy_coord",
@@ -108,4 +112,7 @@ def _output(df):
 if __name__ == "__main__":
     df = _import()
     df = _geocode(df)
+    df["pe_seats_avail"] = df["pc"] - df["pe"]
+    df["ie_seats_avail"] = df["ic"] - df["ie"]
+    df["psis_seats"] = df["pe_seats_avail"] + df["ie_seats_avail"]
     _output(df)

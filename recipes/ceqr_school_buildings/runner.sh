@@ -8,9 +8,11 @@ VERSION=$DATE
 (
     cd $BASEDIR
     mkdir -p output
-    
+
+    echo "Running build.sql ..."
     psql -q $RECIPE_ENGINE --set ON_ERROR_STOP=1 -f build.sql
 
+    echo "Running build.py and create.sql ..."
     docker run --rm\
         -v $(pwd)/../:/recipes\
         -w /recipes/$NAME\
@@ -19,6 +21,7 @@ VERSION=$DATE
         nycplanning/docker-geosupport:latest python3 build.py | 
     psql $EDM_DATA --set ON_ERROR_STOP=1 -v NAME=$NAME -v VERSION=$VERSION -f create.sql
 
+    echo "Running export ..."
     (
         cd output
         
@@ -35,6 +38,9 @@ VERSION=$DATE
         
     )
 
+    echo "Running upload ..."
     Upload $NAME $VERSION
     Upload $NAME latest
+
+    echo "Done!"
 )
